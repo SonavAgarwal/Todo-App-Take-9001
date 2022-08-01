@@ -1,0 +1,380 @@
+@import url("https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+
+* {
+    /* remove amatic sc */
+    font-family: "Space Mono", sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+:root {
+    --lightGray: rgb(222, 222, 222);
+    --gray: rgb(60, 60, 60);
+    --accent: #4287f5;
+    --border: 2px solid var(--gray);
+    --margin: 1rem;
+}
+
+.TaskList {
+    padding-top: var(--margin);
+}
+
+.ListTaskContainer {
+    background-color: white;
+
+    overflow: hidden;
+    border: var(--border);
+    box-sizing: border-box;
+    margin-bottom: var(--margin);
+    margin-left: var(--margin);
+    margin-right: var(--margin);
+    /* transition: height 500ms ease; */
+}
+
+.ListTask {
+    /* padding: 0.5rem; */
+    display: flex;
+}
+.ListTaskDeleted {
+    height: 0;
+}
+
+.ListTaskTextContainer {
+    flex: 1;
+
+    display: grid;
+    grid-template-columns: 1fr;
+
+    box-sizing: border-box;
+    padding: 0.5rem;
+}
+
+.ListTaskText {
+    border: none;
+    outline: none;
+    background-color: transparent;
+
+    padding-right: 0.5rem;
+
+    font-size: 1.5rem;
+    height: 2rem;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-right: 0;
+    margin: 0;
+
+    flex: 1;
+
+    grid-row-start: 1;
+    grid-column-start: 1;
+}
+
+.TimeRangeInputContainer {
+    grid-row-start: 1;
+    grid-column-start: 1;
+    display: flex;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.TimeRangeInputContainerVisible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.TimeRangeInput {
+    -webkit-appearance: none;
+    background: var(--lightGray);
+    -webkit-transition: 0.2s;
+    transition: opacity 0.2s;
+}
+
+.TimeRangeInput::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 2rem;
+    height: 2rem;
+    background: var(--accent);
+    cursor: pointer;
+}
+
+.TimeRangeInputText {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+    font-size: 1.5rem;
+    width: 3rem;
+    margin-left: 1rem;
+    margin-right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ListTaskButton {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+    font-size: 1.5rem;
+    width: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;
+}
+
+.ListTaskButton:hover {
+    opacity: 0.5;
+}
+
+.ListTaskTagsContainer {
+    box-sizing: border-box;
+    padding: 0.5rem;
+    padding-top: 0;
+}
+
+.ListTaskTag {
+    padding: 0.5rem;
+    border: var(--border);
+    display: inline-block;
+    margin-right: 0.5rem;
+    user-select: none;
+}
+
+.CreateTaskContainer {
+    width: 100%;
+    box-sizing: border-box;
+    padding-bottom: var(--margin);
+    padding-left: var(--margin);
+    padding-right: var(--margin);
+}
+
+.CreateTask {
+    display: flex;
+    flex-direction: row;
+
+    box-sizing: border-box;
+    border: var(--border);
+    width: 100%;
+    padding: none;
+}
+
+.CreateTaskInputContainer {
+    flex: 1;
+    display: flex;
+    box-sizing: border-box;
+    padding: 0.5rem;
+}
+.CreateTaskInput {
+    flex: 1;
+    font-size: 1.5rem;
+    border: none;
+    outline: none;
+}
+
+.CreateTaskButton {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+    font-size: 1.5rem;
+    width: 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* .CreateTaskButton:hover {
+    background-color: var(--accent);
+} */
+
+.HomePage {
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    overflow: scroll;
+}
+
+.HomePageScrollContainer {
+    max-width: 50rem;
+    min-width: 50%;
+}
+
+.HomePage::-webkit-scrollbar {
+    display: none;
+}
+
+.HomePageScrollContainer::-webkit-scrollbar {
+    display: none;
+}
+
+.ListTaskTagsContainer .react-colorful {
+    width: 100%;
+    /* transform: scale(0.8); */
+}
+
+.TaskEditFooterContainerContainer {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    animation: fadeIn 0.3s 1 alternate ease;
+}
+.TaskEditFooterContainer {
+    max-width: 50rem;
+    min-width: 50%;
+    box-sizing: border-box;
+    border: var(--border);
+    background-color: white;
+    padding: var(--margin);
+    padding-bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+@media (max-aspect-ratio: 1/1) {
+    .TaskEditFooterContainer {
+        max-width: 50rem;
+        min-width: 100%;
+    }
+}
+.TaskEditFooterContainer button {
+    padding: 1rem;
+    box-sizing: content-box;
+    font-size: 2rem;
+}
+
+.TaskEditFooterContainer div {
+    display: flex;
+    justify-content: center;
+}
+
+.TaskEditFooterContainer p {
+    font-size: 1.5rem;
+    margin-bottom: var(--margin);
+}
+
+.react-colorful {
+    border-radius: 0 !important;
+    border-color: var(--gray);
+}
+
+.react-colorful div {
+    border-radius: 0 !important;
+    border-color: var(--gray);
+}
+
+.react-colorful > div {
+    border: var(--border);
+}
+
+.HomePageHeaderContainer {
+    width: 100%;
+    padding: var(--margin);
+    padding-bottom: 0;
+    box-sizing: border-box;
+}
+
+.HomePageHeader {
+    border: var(--border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.HomePageHeader > div {
+    flex: 1;
+}
+
+.HomePageHeader button {
+    font-size: 2rem;
+    padding: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.HeaderPlateLength {
+    font-size: 1.5rem;
+    transition: font-size 0.5s ease;
+}
+
+.PlatePlaying {
+    font-size: 4rem;
+}
+
+.PlayPlateIcon {
+    transition: width 0.5s ease;
+    width: 2rem;
+}
+
+.PlayPlateIconPlaying {
+    width: 0;
+}
+
+button {
+    background-color: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.5;
+}
+
+.TaskEditFooterContainer input {
+    width: 100%;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.TimeTag {
+    cursor: pointer;
+}
+
+.DateTag {
+    transition: background-color 0.01s ease;
+}
+
+.AuthPage {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.AuthPage button {
+    border: var(--border);
+    padding: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.AuthPage h1 {
+    font-size: 2rem;
+    margin-bottom: var(--margin);
+}
