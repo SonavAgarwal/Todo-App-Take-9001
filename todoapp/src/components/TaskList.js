@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { closestCenter, DndContext, DragOverlay, KeyboardSensor, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { closestCenter, DndContext, DragOverlay, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import ListTask from "./ListTask";
 import { SortableListTask } from "./SortableListTask";
-import { Item } from "./Item";
 import { updateTaskOrder } from "../firebase";
 import { debounce } from "debounce";
 import { typeOptions } from "../misc/options";
@@ -11,13 +10,7 @@ import { typeOptions } from "../misc/options";
 function TaskList({ tasks, order, sortBy }) {
     const [activeId, setActiveId] = useState(null);
     const [listOrder, setListOrder] = useState(order);
-    const sensors = useSensors(
-        // useSensor(KeyboardSensor, {
-        //     coordinateGetter: sortableKeyboardCoordinates,
-        // }),
-        useSensor(MouseSensor),
-        useSensor(TouchSensor)
-    );
+    const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
     useEffect(
         function () {
@@ -27,10 +20,7 @@ function TaskList({ tasks, order, sortBy }) {
     );
 
     function saveOrder(newOrder) {
-        // console.log(order);
-        // console.log(newOrder);
         if (!newOrder) {
-            console.log("returning 1");
             return;
         }
         if (
@@ -39,10 +29,8 @@ function TaskList({ tasks, order, sortBy }) {
                 return val === newOrder[idx];
             })
         ) {
-            console.log("returning");
             return;
         }
-        console.log("save order");
         updateTaskOrder(newOrder);
     }
 
@@ -53,54 +41,52 @@ function TaskList({ tasks, order, sortBy }) {
         function () {
             saveOrderDebounced(listOrder);
         },
-        [listOrder]
+        [listOrder, saveOrderDebounced]
     );
-
-    function sortByDate() {
-        let workingListOrder = [...listOrder];
-        workingListOrder.sort(function (a, b) {
-            let aDate = tasks[a]?.date?.toDate();
-            let bDate = tasks[b]?.date?.toDate();
-            if (!aDate) aDate = new Date(8640000000000000);
-            if (!bDate) bDate = new Date(8640000000000000);
-            return aDate - bDate;
-        });
-        setListOrder(workingListOrder);
-    }
-
-    function sortByLength() {
-        let workingListOrder = [...listOrder];
-        workingListOrder.sort(function (a, b) {
-            return (tasks[a]?.length - tasks[b]?.length) * -1; // show longer tasks first
-        });
-        setListOrder(workingListOrder);
-    }
-
-    function sortByType() {
-        let workingListOrder = [...listOrder];
-        workingListOrder.sort(function (a, b) {
-            let aInd = typeOptions.indexOf(tasks[a].type);
-            let bInd = typeOptions.indexOf(tasks[b].type);
-            return aInd - bInd;
-        });
-        setListOrder(workingListOrder);
-    }
-
-    function sortByAlphabetical(property) {
-        let workingListOrder = [...listOrder];
-        workingListOrder.sort(function (a, b) {
-            let aProp = tasks[a][property];
-            let bProp = tasks[b][property];
-            if (!aProp) aProp = "π";
-            if (!bProp) bProp = "π";
-            return "".localeCompare.call(aProp, bProp);
-            // return aProp.toString().localCompare(bProp.toString());
-        });
-        setListOrder(workingListOrder);
-    }
 
     useEffect(
         function () {
+            function sortByDate() {
+                let workingListOrder = [...listOrder];
+                workingListOrder.sort(function (a, b) {
+                    let aDate = tasks[a]?.date?.toDate();
+                    let bDate = tasks[b]?.date?.toDate();
+                    if (!aDate) aDate = new Date(8640000000000000);
+                    if (!bDate) bDate = new Date(8640000000000000);
+                    return aDate - bDate;
+                });
+                setListOrder(workingListOrder);
+            }
+
+            function sortByLength() {
+                let workingListOrder = [...listOrder];
+                workingListOrder.sort(function (a, b) {
+                    return (tasks[a]?.length - tasks[b]?.length) * -1; // show longer tasks first
+                });
+                setListOrder(workingListOrder);
+            }
+
+            function sortByType() {
+                let workingListOrder = [...listOrder];
+                workingListOrder.sort(function (a, b) {
+                    let aInd = typeOptions.indexOf(tasks[a].type);
+                    let bInd = typeOptions.indexOf(tasks[b].type);
+                    return aInd - bInd;
+                });
+                setListOrder(workingListOrder);
+            }
+
+            function sortByAlphabetical(property) {
+                let workingListOrder = [...listOrder];
+                workingListOrder.sort(function (a, b) {
+                    let aProp = tasks[a][property];
+                    let bProp = tasks[b][property];
+                    if (!aProp) aProp = "π";
+                    if (!bProp) bProp = "π";
+                    return "".localeCompare.call(aProp, bProp);
+                });
+                setListOrder(workingListOrder);
+            }
             switch (sortBy) {
                 case "none":
                     return;
@@ -119,7 +105,7 @@ function TaskList({ tasks, order, sortBy }) {
                     break;
             }
         },
-        [sortBy]
+        [sortBy, listOrder, tasks]
     );
 
     function isIterable(input) {
@@ -160,7 +146,6 @@ function TaskList({ tasks, order, sortBy }) {
     }
 
     function handleDragEnd(event) {
-        console.log(event);
         const { active, over } = event;
 
         if (active.id !== over.id) {

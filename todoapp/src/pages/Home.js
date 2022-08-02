@@ -1,26 +1,12 @@
 import { signOut } from "firebase/auth";
-import { addDoc, collection, doc, increment } from "firebase/firestore";
+import { doc, increment } from "firebase/firestore";
 import React, { createContext, useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollection, useCollectionData, useDocumentData } from "react-firebase-hooks/firestore";
+import { useDocumentData } from "react-firebase-hooks/firestore";
 import { auth, createTask, firestore, updateTask } from "../firebase";
 import { useForm } from "react-hook-form";
-import ListTask from "../components/ListTask";
 import TaskList from "../components/TaskList";
-import {
-    BiCalendar,
-    BiCalendarAlt,
-    BiCategoryAlt,
-    BiCheckSquare,
-    BiFontFamily,
-    BiLogOut,
-    BiMenu,
-    BiPause,
-    BiPlay,
-    BiPlus,
-    BiPointer,
-    BiTime,
-} from "react-icons/bi";
+import { BiCalendarAlt, BiCategoryAlt, BiCheckSquare, BiFontFamily, BiLogOut, BiMenu, BiPlay, BiPlus, BiPointer, BiTime } from "react-icons/bi";
 import { lengthCountedTags, lengthStep } from "../misc/options";
 
 export const NewTaskContext = createContext();
@@ -37,9 +23,9 @@ const sortIcons = [
 ];
 
 function Home(props) {
-    const [user, userLoading, userError] = useAuthState(auth);
-    const [tasks, tasksLoading, tasksError] = useDocumentData(doc(firestore, `users/${user?.uid}/data/tasks`));
-    const [userConfig, userDataLoading, userDataError] = useDocumentData(doc(firestore, `users/${user?.uid}/data/config`));
+    const [user] = useAuthState(auth);
+    const [tasks, tasksLoading] = useDocumentData(doc(firestore, `users/${user?.uid}/data/tasks`));
+    const [userConfig] = useDocumentData(doc(firestore, `users/${user?.uid}/data/config`));
 
     const [listOrder, setListOrder] = useState(tasks?.order);
     useEffect(
@@ -48,8 +34,6 @@ function Home(props) {
         },
         [tasks]
     );
-    // console.log("listOrder");
-    // console.log(listOrder);
 
     const [sortBy, setSortBy] = useState("none");
 
@@ -59,15 +43,7 @@ function Home(props) {
         setFocus("text");
     }
 
-    const {
-        register,
-        handleSubmit,
-        reset,
-        setFocus,
-
-        formState: { errors },
-    } = useForm();
-    // const onSubmit = (data) => console.log(data);
+    const { register, handleSubmit, reset, setFocus } = useForm();
 
     function onSubmit(data) {
         createTask(data.text);
@@ -76,13 +52,6 @@ function Home(props) {
             newTaskRef.current.scrollIntoView();
         }, 500);
     }
-
-    // console.log(user?.uid);
-
-    // if (!!tasks) {
-    //     console.log("tasks");
-    //     console.log(tasks);
-    // }
 
     const [plateLength, setPlateLength] = useState(0);
     const [plateColon, setPlateColon] = useState(true);
@@ -105,13 +74,6 @@ function Home(props) {
         [tasks]
     );
 
-    // useEffect(
-    //     function () {
-    //         setPlateColon(true);
-    //     },
-    //     [platePlaying]
-    // );
-
     useEffect(
         function () {
             if (platePlaying) {
@@ -133,17 +95,29 @@ function Home(props) {
     useEffect(
         function () {
             if (platePlaying) {
-                let interval = setInterval(() => {
+                function findNextTaskId() {
                     let nextTaskId = tasks.order.find(function (taskId) {
                         let task = tasks[taskId];
-                        return parseInt(task.length) >= lengthStep && task.plate;
+                        return task.plate && parseInt(task.length) >= lengthStep;
                     });
+                    // let nextTask = tasks[nextTaskId];
+                    return nextTaskId;
+                }
+
+                console.log(findNextTaskId());
+
+                if (!findNextTaskId()) {
+                    setPlatePlaying(false);
+                    return;
+                }
+
+                let interval = setInterval(() => {
+                    let nextTaskId = findNextTaskId();
+
                     if (!nextTaskId) {
                         setPlatePlaying(false);
+                        return;
                     }
-                    let nextTask = tasks[nextTaskId];
-
-                    console.log("nextTask", nextTask);
 
                     updateTask(nextTaskId, { length: increment(-1 * lengthStep) });
                 }, lengthStep * 60 * 1000);
@@ -172,6 +146,7 @@ function Home(props) {
                                 <div></div>
                                 <button
                                     onClick={function () {
+                                        if (!platePlaying && plateLength < lengthStep) return;
                                         setPlatePlaying(!platePlaying);
                                     }}>
                                     {<BiPlay className={`PlayPlateIcon ${platePlaying ? "PlayPlateIconPlaying" : ""}`} />}
@@ -194,6 +169,7 @@ function Home(props) {
                                     <input
                                         className='CreateTaskInput'
                                         placeholder='new task...'
+                                        autoComplete='off'
                                         onFocus={function (event) {
                                             event.target.scrollIntoView();
                                         }}

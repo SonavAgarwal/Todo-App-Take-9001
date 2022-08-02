@@ -1,18 +1,13 @@
-// todo remove gauth wrapper from index js
-
 import "./App.css";
 import "./reset.css";
 
-import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 
-import { auth, firebaseConfig } from "./firebase";
-import { useAuthState, useSignInWithGoogle } from "react-firebase-hooks/auth";
+import { auth } from "./firebase";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { useEffect } from "react";
 import Auth from "./pages/Auth";
 import Home from "./pages/Home";
-
-// const root = ReactDOM.createRoot(document.getElementById("root"));
 
 function AppWrapper() {
     return (
@@ -23,7 +18,7 @@ function AppWrapper() {
 }
 
 function App() {
-    const [user, loading, error] = useAuthState(auth);
+    const [user] = useAuthState(auth); // loading, error
 
     const navigate = useNavigate();
 
@@ -35,7 +30,7 @@ function App() {
                 navigate("/auth");
             }
         },
-        [user]
+        [user, navigate]
     );
 
     return (
