@@ -47,7 +47,7 @@ function TaskList({ tasks, order, sortBy }) {
     useEffect(
         function () {
             function sortByDate() {
-                let workingListOrder = [...listOrder];
+                let workingListOrder = [...order];
                 workingListOrder.sort(function (a, b) {
                     let aDate = tasks[a]?.date?.toDate();
                     let bDate = tasks[b]?.date?.toDate();
@@ -59,7 +59,7 @@ function TaskList({ tasks, order, sortBy }) {
             }
 
             function sortByLength() {
-                let workingListOrder = [...listOrder];
+                let workingListOrder = [...order];
                 workingListOrder.sort(function (a, b) {
                     return (tasks[a]?.length - tasks[b]?.length) * -1; // show longer tasks first
                 });
@@ -67,7 +67,7 @@ function TaskList({ tasks, order, sortBy }) {
             }
 
             function sortByType() {
-                let workingListOrder = [...listOrder];
+                let workingListOrder = [...order];
                 workingListOrder.sort(function (a, b) {
                     let aInd = typeOptions.indexOf(tasks[a].type);
                     let bInd = typeOptions.indexOf(tasks[b].type);
@@ -77,7 +77,7 @@ function TaskList({ tasks, order, sortBy }) {
             }
 
             function sortByAlphabetical(property) {
-                let workingListOrder = [...listOrder];
+                let workingListOrder = [...order];
                 workingListOrder.sort(function (a, b) {
                     let aProp = tasks[a][property];
                     let bProp = tasks[b][property];
@@ -96,7 +96,6 @@ function TaskList({ tasks, order, sortBy }) {
                 case "length":
                     sortByLength();
                     break;
-
                 case "type":
                     sortByType();
                     break;
@@ -105,7 +104,7 @@ function TaskList({ tasks, order, sortBy }) {
                     break;
             }
         },
-        [sortBy, listOrder, tasks]
+        [sortBy, order, tasks]
     );
 
     function isIterable(input) {

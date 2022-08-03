@@ -1,13 +1,15 @@
 import { deleteField } from "firebase/firestore";
 import isUrl from "is-url";
 
-export const versionNumber = 1.4;
+export const versionNumber = 1.5;
 
 export const typeOptions = ["long", "short", "email", "thought"];
-export const typeOptionsDisplay = { thought: "💡", email: "📧", short: "⚡" };
+export const typeOptionsDisplay = { thought: "💡", email: "📧" };
 export const preferredTagOrder = ["length", "tag", "date", "type", "link"];
 export const lengthCountedTags = ["long", "email"];
-export const lengthStep = 5; // TODO deploy
+export const lengthStep = 5;
+
+export const daysOfWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
 export const defaultTask = {
     type: "long",
@@ -32,6 +34,9 @@ export function parseNewTextToUpdateObject(changedText) {
                 if (tag.toLowerCase() === "email") {
                     updateObject.length = 5;
                 }
+                if (tag.toLowerCase() === "short" || tag.toLowerCase() === "thought") {
+                    updateObject.length = 0;
+                } // Todo make not hardcoded
             } else if (!isNaN(Date.parse(tag))) {
                 let dueDate = new Date(Date.parse(tag));
                 dueDate.setFullYear(new Date().getFullYear());
@@ -40,6 +45,15 @@ export function parseNewTextToUpdateObject(changedText) {
                     dueDate.setFullYear(new Date().getFullYear() + 1);
                 }
 
+                updateObject.date = dueDate;
+            } else if (daysOfWeek.includes(tag.toLowerCase())) {
+                let todayDay = daysOfWeek[new Date().getDay()];
+                let dayDifference = daysOfWeek.indexOf(tag) - daysOfWeek.indexOf(todayDay);
+                if (dayDifference < 0) {
+                    dayDifference += 7;
+                }
+                let dueDate = new Date();
+                dueDate.setDate(dueDate.getDate() + dayDifference);
                 updateObject.date = dueDate;
             } else if (tag === "/") {
                 updateObject.date = deleteField();

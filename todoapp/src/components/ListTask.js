@@ -1,7 +1,7 @@
 import { debounce } from "debounce";
 import React, { forwardRef, useCallback, useContext, useEffect, useState } from "react";
 import { deleteTask, updateConfigColors, updateTask } from "../firebase";
-import { lengthStep, parseNewTextToUpdateObject, preferredTagOrder, typeOptionsDisplay } from "../misc/options";
+import { lengthCountedTags, lengthStep, parseNewTextToUpdateObject, preferredTagOrder, typeOptionsDisplay } from "../misc/options";
 import { BiCheck, BiCheckSquare, BiGridVertical, BiSquare, BiX } from "react-icons/bi";
 import { NewTaskContext, UserConfigContext } from "../pages/Home";
 import { useSwipeable } from "react-swipeable";
@@ -100,7 +100,7 @@ const ListTask = forwardRef(({ taskId, task, attributes, listeners, style, sortB
     return (
         <div style={style} ref={ref}>
             <AnimateHeight duration={500} height={deleted ? 0 : "auto"}>
-                <div className='ListTaskContainer'>
+                <div className='ListTaskContainer' style={{ opacity: task?.length === 0 && lengthCountedTags.includes(task?.type) ? 0.5 : 1 }}>
                     <div className='ListTask'>
                         <div className='ListTaskTextContainer'>
                             <input
@@ -115,42 +115,22 @@ const ListTask = forwardRef(({ taskId, task, attributes, listeners, style, sortB
                                         focusNewTaskRef();
                                     }
                                 }}></input>
-                            {/* <div className={`TimeRangeInputContainer ${editMode ? "TimeRangeInputContainerVisible" : ""}`}>
-                                <input
-                                    size={1}
-                                    type={"range"}
-                                    min={5}
-                                    max={120}
-                                    value={timeSliderValue}
-                                    onClick={handleMultipleTimeClicks}
-                                    onChange={function (event) {
-                                        setTimeSliderValue(event.target.value);
-                                    }}
-                                    className='ListTaskText TimeRangeInput'></input>
-                                <p className='TimeRangeInputText' onClick={handleMultipleTimeClicks}>
-                                    {timeSliderValue}{" "}
-                                </p>
-                            </div> */}
                         </div>
                         <button
                             onClick={function () {
                                 setPlate(!plate);
                             }}
-                            className='ListTaskButton'
-                            {...editSwipeHandlers}>
+                            className='ListTaskButton safariButton'
+                            {...editSwipeHandlers}
+                            tabIndex={-1}>
                             {plate ? <BiCheckSquare /> : <BiSquare />}
                         </button>
-                        <div className='ListTaskButton' {...attributes} {...listeners}>
+                        <div className='ListTaskButton' {...attributes} {...listeners} tabIndex={-1}>
                             <BiGridVertical />
                         </div>
                     </div>
                     <div className='ListTaskTagsContainer'>
                         <TagsOrdered />
-
-                        {/* {task?.length && <ListTaskTag task={task} property={"length"} dragging={props.dragging} taskId={taskId} />}
-                        {task?.tag && <ListTaskTag task={task} property={"tag"} dragging={props.dragging} taskId={taskId} />}
-                        {task?.date && <ListTaskTag task={task} property={"date"} dragging={props.dragging} taskId={taskId} />}
-                        {task?.type && <ListTaskTag task={task} property={"type"} dragging={props.dragging} taskId={taskId} />} */}
                     </div>
                 </div>
             </AnimateHeight>
@@ -253,7 +233,8 @@ function ListTaskTag({ task, property, dragging, taskId }) {
                                     onClick={function () {
                                         setPickingColor(false);
                                         restoreDefaultColor();
-                                    }}>
+                                    }}
+                                    tabIndex={-1}>
                                     <BiX />
                                 </button>
                                 <button
@@ -261,7 +242,8 @@ function ListTaskTag({ task, property, dragging, taskId }) {
                                     onClick={function () {
                                         setPickingColor(false);
                                         saveTagColor();
-                                    }}>
+                                    }}
+                                    tabIndex={-1}>
                                     <BiCheck />
                                 </button>
                             </div>
@@ -286,7 +268,7 @@ function ListTaskTag({ task, property, dragging, taskId }) {
 
     if (property === "link") {
         return (
-            <a href={task[property]} target='_blank' rel='noopener noreferrer'>
+            <a href={task[property]} target='_blank' rel='noopener noreferrer' tabIndex={-1}>
                 <div className='ListTaskTag'>🔗</div>
             </a>
         );
@@ -322,14 +304,16 @@ function ListTaskTag({ task, property, dragging, taskId }) {
                                 onChange={function (event) {
                                     setTime(parseInt(event.target.value));
                                 }}
-                                className='ListTaskText TimeRangeInput'></input>
+                                className='ListTaskText TimeRangeInput'
+                                tabIndex={-1}></input>
                             <div>
                                 <button
                                     className='ListTaskButton'
                                     onClick={function () {
                                         setPickingTime(false);
                                         restoreDefaultTime();
-                                    }}>
+                                    }}
+                                    tabIndex={-1}>
                                     <BiX />
                                 </button>
                                 <button
@@ -337,7 +321,8 @@ function ListTaskTag({ task, property, dragging, taskId }) {
                                     onClick={function () {
                                         setPickingTime(false);
                                         saveTime();
-                                    }}>
+                                    }}
+                                    tabIndex={-1}>
                                     <BiCheck />
                                 </button>
                             </div>

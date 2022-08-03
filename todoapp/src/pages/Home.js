@@ -140,7 +140,8 @@ function Home(props) {
                                 <button
                                     onClick={function () {
                                         signOut(auth);
-                                    }}>
+                                    }}
+                                    tabIndex={-1}>
                                     <BiLogOut />
                                 </button>
                                 <div></div>
@@ -148,7 +149,8 @@ function Home(props) {
                                     onClick={function () {
                                         if (!platePlaying && plateLength < lengthStep) return;
                                         setPlatePlaying(!platePlaying);
-                                    }}>
+                                    }}
+                                    tabIndex={-1}>
                                     {<BiPlay className={`PlayPlateIcon ${platePlaying ? "PlayPlateIconPlaying" : ""}`} />}
                                     <p className={`HeaderPlateLength ${platePlaying ? "PlatePlaying" : ""}`}>
                                         {Math.floor(plateLength / 60)}
@@ -176,7 +178,7 @@ function Home(props) {
                                         {...register("text")}
                                     />
                                 </div>
-                                <button className='CreateTaskButton' type='submit'>
+                                <button className='CreateTaskButton' type='submit' tabIndex={-1}>
                                     <BiPlus />
                                 </button>
                             </form>
@@ -206,7 +208,8 @@ function SortByButton({ sortBy, setSortBy }) {
         <button
             onClick={function () {
                 setSortBy(nextSortBy);
-            }}>
+            }}
+            tabIndex={-1}>
             {currentSortBy.icon}
         </button>
     );

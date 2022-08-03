@@ -133,15 +133,18 @@ html {
 
 .ListTaskTagsContainer {
     box-sizing: border-box;
-    padding: 0.5rem;
-    padding-top: 0;
+    /* padding: 0.5rem; */
+    /* padding-top: 0; */
+    padding: 0;
 }
 
 .ListTaskTag {
     padding: 0.5rem;
     border: var(--border);
     display: inline-block;
-    margin-right: 0.5rem;
+    margin-left: 0.5rem;
+    /* margin-top: 0.5rem; */
+    margin-bottom: 0.5rem;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
@@ -416,4 +419,8 @@ a:active {
 
 .AuthPage p {
     font-size: 1rem;
+}
+
+.safariButton {
+    background-color: #fefefe;
 }
