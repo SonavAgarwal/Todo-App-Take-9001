@@ -1,7 +1,7 @@
 import { deleteField } from "firebase/firestore";
 import isUrl from "is-url";
 
-export const versionNumber = 1.5;
+export const versionNumber = 1.6;
 
 export const typeOptions = ["long", "short", "email", "thought"];
 export const typeOptionsDisplay = { thought: "💡", email: "📧" };
@@ -48,7 +48,7 @@ export function parseNewTextToUpdateObject(changedText) {
                 updateObject.date = dueDate;
             } else if (daysOfWeek.includes(tag.toLowerCase())) {
                 let todayDay = daysOfWeek[new Date().getDay()];
-                let dayDifference = daysOfWeek.indexOf(tag) - daysOfWeek.indexOf(todayDay);
+                let dayDifference = daysOfWeek.indexOf(tag.toLowerCase()) - daysOfWeek.indexOf(todayDay);
                 if (dayDifference < 0) {
                     dayDifference += 7;
                 }
