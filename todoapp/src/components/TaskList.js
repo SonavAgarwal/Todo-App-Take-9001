@@ -7,7 +7,7 @@ import { updateTaskOrder } from "../firebase";
 import { debounce } from "debounce";
 import { typeOptions } from "../misc/options";
 
-function TaskList({ tasks, order, sortBy }) {
+function TaskList({ taskListId, tasks, order, sortBy }) {
     const [activeId, setActiveId] = useState(null);
     const [listOrder, setListOrder] = useState(order);
     const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
@@ -31,7 +31,7 @@ function TaskList({ tasks, order, sortBy }) {
         ) {
             return;
         }
-        updateTaskOrder(newOrder);
+        updateTaskOrder(taskListId, newOrder);
     }
 
     // eslint-disable-next-line
@@ -128,11 +128,21 @@ function TaskList({ tasks, order, sortBy }) {
                 <SortableContext items={listOrder} strategy={verticalListSortingStrategy}>
                     {listOrder?.map(function (taskId) {
                         return (
-                            <SortableListTask task={tasks[taskId]} taskId={taskId} key={taskId} id={taskId} dragging={activeId === taskId} sortBy={sortBy} />
+                            <SortableListTask
+                                taskListId={taskListId}
+                                task={tasks[taskId]}
+                                taskId={taskId}
+                                key={taskId}
+                                id={taskId}
+                                dragging={activeId === taskId}
+                                sortBy={sortBy}
+                            />
                         );
                     })}
                 </SortableContext>
-                <DragOverlay>{activeId ? <ListTask id={activeId} task={tasks[activeId]} taskId={activeId} sortBy={sortBy} /> : null}</DragOverlay>
+                <DragOverlay>
+                    {activeId ? <ListTask taskListId={taskListId} id={activeId} task={tasks[activeId]} taskId={activeId} sortBy={sortBy} /> : null}
+                </DragOverlay>
                 {/* todo add sorting */}
             </DndContext>
         </div>

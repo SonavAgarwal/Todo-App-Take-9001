@@ -9,10 +9,11 @@ import AnimateHeight from "react-animate-height";
 import chroma from "chroma-js";
 import { HexColorPicker } from "react-colorful";
 import { useLongPress } from "use-long-press";
+import SubTaskList from "./SubTaskList";
 
 const dueDateScale = chroma.scale(["ff3838", "ff3838", "f9ff69", "7eff74"]).domain([0, 0.1, 0.8, 1]);
 
-const ListTask = forwardRef(({ taskId, task, attributes, listeners, style, sortBy, ...props }, ref) => {
+const ListTask = forwardRef(({ taskListId, taskId, task, attributes, listeners, style, sortBy, ...props }, ref) => {
     const [taskText, setTaskText] = useState(task?.text);
 
     const focusNewTaskRef = useContext(NewTaskContext);
@@ -24,7 +25,7 @@ const ListTask = forwardRef(({ taskId, task, attributes, listeners, style, sortB
         onSwipedRight: function () {
             setDeleted(true);
             setTimeout(() => {
-                deleteTask(taskId);
+                deleteTask(taskListId, taskId, task?.wasList);
             }, 500);
         },
         trackMouse: true,
@@ -48,14 +49,20 @@ const ListTask = forwardRef(({ taskId, task, attributes, listeners, style, sortB
         if (!changedText) return;
 
         let updateObject = parseNewTextToUpdateObject(changedText);
+        // prevent deep nested tasks
+        if (taskListId !== "tasks" && task.type && updateObject.type === "list") {
+            // if this is a subtask and the task type is not undefined and the type is list
+            updateObject.type = task.type;
+            updateObject.wasList = false; // todo wastes storage space
+        }
 
-        updateTask(taskId, updateObject);
+        updateTask(taskListId, taskId, updateObject);
     }
 
     function handlePlateEdit(newPlate) {
         if (deleted) return;
-        if (task.plate === newPlate) return;
-        updateTask(taskId, { plate: newPlate });
+        if (task?.plate === newPlate) return;
+        updateTask(taskListId, taskId, { plate: newPlate });
     }
 
     // eslint-disable-next-line
@@ -84,13 +91,15 @@ const ListTask = forwardRef(({ taskId, task, attributes, listeners, style, sortB
         if (!task) return renderedTags;
         if (sortBy !== "text") {
             if (task[sortBy] || (sortBy === "length" && task[sortBy] === 0)) {
-                renderedTags.push(<ListTaskTag key={key} task={task} taskId={taskId} property={sortBy} dragging={props.dragging} />);
+                renderedTags.push(<ListTaskTag taskListId={taskListId} key={key} task={task} taskId={taskId} property={sortBy} dragging={props.dragging} />);
                 key++;
             }
         }
         for (let taskProperty of preferredTagOrder) {
             if (taskProperty !== sortBy && (task[taskProperty] || (taskProperty === "length" && task[taskProperty] === 0))) {
-                renderedTags.push(<ListTaskTag key={key} task={task} taskId={taskId} property={taskProperty} dragging={props.dragging} />);
+                renderedTags.push(
+                    <ListTaskTag taskListId={taskListId} key={key} task={task} taskId={taskId} property={taskProperty} dragging={props.dragging} />
+                );
                 key++;
             }
         }
@@ -132,13 +141,14 @@ const ListTask = forwardRef(({ taskId, task, attributes, listeners, style, sortB
                     <div className='ListTaskTagsContainer'>
                         <TagsOrdered />
                     </div>
+                    {task?.type === "list" && <SubTaskList subTaskListId={taskId}></SubTaskList>}
                 </div>
             </AnimateHeight>
         </div>
     );
 });
 
-function ListTaskTag({ task, property, dragging, taskId }) {
+function ListTaskTag({ taskListId, task, property, dragging, taskId }) {
     const userData = useContext(UserConfigContext);
     const [color, setColor] = useState(determineColor());
     const [pickingColor, setPickingColor] = useState(false);
@@ -176,7 +186,7 @@ function ListTaskTag({ task, property, dragging, taskId }) {
 
     function saveTime() {
         if (time === task.length) return;
-        updateTask(taskId, { length: time });
+        updateTask(taskListId, taskId, { length: time });
     }
 
     function restoreDefaultColor() {

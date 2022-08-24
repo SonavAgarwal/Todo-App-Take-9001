@@ -424,3 +424,7 @@ a:active {
 .safariButton {
     background-color: #fefefe;
 }
+
+.SubTaskListContainer {
+    margin-top: 0.5rem;
+}

@@ -1,9 +1,9 @@
 import { deleteField } from "firebase/firestore";
 import isUrl from "is-url";
 
-export const versionNumber = 1.6;
+export const versionNumber = 1.7;
 
-export const typeOptions = ["long", "short", "email", "thought"];
+export const typeOptions = ["long", "short", "email", "list", "thought"]; // order controls sorted order
 export const typeOptionsDisplay = { thought: "💡", email: "📧" };
 export const preferredTagOrder = ["length", "tag", "date", "type", "link"];
 export const lengthCountedTags = ["long", "email"];
@@ -31,6 +31,9 @@ export function parseNewTextToUpdateObject(changedText) {
 
             if (typeOptions.includes(tag.toLowerCase())) {
                 updateObject.type = tag.toLowerCase();
+                if (tag.toLowerCase() === "list") {
+                    updateObject.wasList = true;
+                }
                 if (tag.toLowerCase() === "email") {
                     updateObject.length = 5;
                 }

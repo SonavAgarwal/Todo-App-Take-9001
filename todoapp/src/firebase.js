@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { arrayRemove, arrayUnion, deleteField, doc, getFirestore, setDoc, updateDoc } from "firebase/firestore";
+import { arrayRemove, arrayUnion, deleteDoc, deleteField, doc, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
 import { defaultTask, parseNewTextToUpdateObject } from "./misc/options";
 
@@ -26,7 +26,7 @@ onAuthStateChanged(auth, function (u) {
     }
 });
 
-export function createTask(text) {
+export function createTask(taskList, text) {
     if (!text) return;
 
     console.log("Creating task: " + text);
@@ -37,17 +37,22 @@ export function createTask(text) {
     };
 
     let taskUpdateObject = parseNewTextToUpdateObject(text);
+    // prevent deep nested tasks
+    if (taskList !== "tasks") {
+        taskUpdateObject.type = defaultTask.type;
+        taskUpdateObject.wasList = false; // todo wastes storage space
+    }
 
     updateObject.order = arrayUnion(taskUuid);
     console.log(taskUpdateObject);
     console.log({ ...defaultTask, ...taskUpdateObject });
     updateObject[taskUuid] = { ...defaultTask, ...taskUpdateObject };
 
-    const taskDocRef = doc(firestore, `users/${user.uid}/data`, "tasks");
+    const taskDocRef = doc(firestore, `users/${user.uid}/data`, taskList);
     setDoc(taskDocRef, updateObject, { merge: true });
 }
 
-export function updateTask(taskId, newData) {
+export function updateTask(taskList, taskId, newData) {
     console.log("Updating task " + taskId);
 
     // newData is an object
@@ -62,28 +67,34 @@ export function updateTask(taskId, newData) {
         updateObject[updateObjectKey] = newDataPiece;
     }
 
-    const taskDocRef = doc(firestore, `users/${user.uid}/data`, "tasks");
+    const taskDocRef = doc(firestore, `users/${user.uid}/data`, taskList);
     updateDoc(taskDocRef, updateObject);
 }
 
-export function deleteTask(taskId) {
+export function deleteTask(taskList, taskId, wasList) {
     console.log("Deleting " + taskId);
+
+    if (wasList) {
+        console.log("Deleting potential sub list");
+        // will be counted as a delete op even if the list was never populated
+        deleteDoc(doc(firestore, `users/${user.uid}/data`, taskId));
+    }
 
     let updateObject = {
         order: arrayRemove(taskId),
     };
     updateObject[taskId] = deleteField();
 
-    const taskDocRef = doc(firestore, `users/${user.uid}/data`, "tasks");
+    const taskDocRef = doc(firestore, `users/${user.uid}/data`, taskList);
     updateDoc(taskDocRef, updateObject);
 }
 
-export function updateTaskOrder(newOrder) {
+export function updateTaskOrder(taskList, newOrder) {
     console.log("Rearranging", newOrder);
     let updateObject = {
         order: newOrder,
     };
-    const taskDocRef = doc(firestore, `users/${user.uid}/data`, "tasks");
+    const taskDocRef = doc(firestore, `users/${user.uid}/data`, taskList);
     updateDoc(taskDocRef, updateObject);
 }
 
@@ -99,3 +110,5 @@ export function updateConfigColors(word, color) {
     const configDocRef = doc(firestore, `users/${user.uid}/data`, "config");
     setDoc(configDocRef, updateObject, { merge: true });
 }
+
+export function cleanUnusedListDocs(mainTaskIdList) {}

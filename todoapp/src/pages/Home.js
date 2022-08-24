@@ -46,7 +46,7 @@ function Home(props) {
     const { register, handleSubmit, reset, setFocus } = useForm();
 
     function onSubmit(data) {
-        createTask(data.text);
+        createTask("tasks", data.text);
         reset();
         setTimeout(() => {
             newTaskRef.current.scrollIntoView();
@@ -64,7 +64,7 @@ function Home(props) {
             if (tasks) {
                 let plateLengthTotal = 0;
                 for (let taskId of tasks.order) {
-                    if (tasks[taskId].plate && lengthCountedTags.includes(tasks[taskId].type)) {
+                    if (tasks[taskId]?.plate && lengthCountedTags.includes(tasks[taskId].type)) {
                         plateLengthTotal += parseInt(tasks[taskId].length);
                     }
                 }
@@ -119,7 +119,7 @@ function Home(props) {
                         return;
                     }
 
-                    updateTask(nextTaskId, { length: increment(-1 * lengthStep) });
+                    updateTask("tasks", nextTaskId, { length: increment(-1 * lengthStep) });
                 }, lengthStep * 60 * 1000);
 
                 return function () {
@@ -164,7 +164,7 @@ function Home(props) {
                                 {<SortByButton sortBy={sortBy} setSortBy={setSortBy} />}
                             </div>
                         </div>
-                        {!tasksLoading && <TaskList tasks={tasks} order={listOrder} sortBy={sortBy}></TaskList>}
+                        {!tasksLoading && <TaskList taskListId={"tasks"} tasks={tasks} order={listOrder} sortBy={sortBy}></TaskList>}
                         <div className='CreateTaskContainer' ref={newTaskRef}>
                             <form className='CreateTask' onSubmit={handleSubmit(onSubmit)}>
                                 <div className='CreateTaskInputContainer'>
