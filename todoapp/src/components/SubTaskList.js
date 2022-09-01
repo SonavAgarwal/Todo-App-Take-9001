@@ -26,7 +26,7 @@ function SubTaskList({ subTaskListId }) {
         createTask(subTaskListId, data.text);
         reset();
         setTimeout(() => {
-            newTaskRef.current.scrollIntoView();
+            // newTaskRef.current.scrollIntoView();
         }, 500);
     }
 
@@ -38,10 +38,11 @@ function SubTaskList({ subTaskListId }) {
                     <div className='CreateTaskInputContainer'>
                         <input
                             className='CreateTaskInput'
+                            size={1}
                             placeholder='new subtask...'
                             autoComplete='off'
                             onFocus={function (event) {
-                                event.target.scrollIntoView();
+                                // event.target.scrollIntoView();
                             }}
                             {...register("text")}
                         />
