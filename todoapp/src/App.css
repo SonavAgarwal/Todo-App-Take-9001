@@ -1,209 +1,209 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 
 * {
-    font-family: "Space Mono", sans-serif;
+	font-family: "Space Mono", sans-serif;
 }
 
 html {
-    scroll-behavior: smooth;
+	scroll-behavior: smooth;
 }
 
 :root {
-    --lightGray: rgb(222, 222, 222);
-    --gray: #3c3c3c;
-    --accent: #4287f5;
-    --border: 2px solid var(--gray);
-    --margin: 1rem;
+	--lightGray: rgb(222, 222, 222);
+	--gray: #3c3c3c;
+	--accent: #4287f5;
+	--border: 2px solid var(--gray);
+	--margin: 1rem;
 }
 
 .TaskList {
-    /* padding-top: var(--margin); */
+	/* padding-top: var(--margin); */
 }
 
 .ListTaskContainer {
-    background-color: white;
+	background-color: white;
 
-    overflow: hidden;
-    border: var(--border);
-    box-sizing: border-box;
-    margin-bottom: var(--margin);
-    margin-left: var(--margin);
-    margin-right: var(--margin);
-    /* transition: height 500ms ease; */
+	overflow: hidden;
+	border: var(--border);
+	box-sizing: border-box;
+	margin-bottom: var(--margin);
+	margin-left: var(--margin);
+	margin-right: var(--margin);
+	/* transition: height 500ms ease; */
 }
 
 .ListTask {
-    /* padding: 0.5rem; */
-    display: flex;
+	/* padding: 0.5rem; */
+	display: flex;
 }
 .ListTaskDeleted {
-    height: 0;
+	height: 0;
 }
 
 .ListTaskTextContainer {
-    flex: 1;
+	flex: 1;
 
-    display: grid;
-    grid-template-columns: 1fr;
+	display: grid;
+	grid-template-columns: 1fr;
 
-    box-sizing: border-box;
-    padding: 0.5rem;
+	box-sizing: border-box;
+	padding: 0.5rem;
 }
 
 .ListTaskText {
-    border: none;
-    outline: none;
-    background-color: transparent;
+	border: none;
+	outline: none;
+	background-color: transparent;
 
-    padding-right: 0.5rem;
+	padding-right: 0.5rem;
 
-    font-size: 1.5rem;
-    height: 2rem;
-    padding-top: 0;
-    padding-bottom: 0;
-    padding-right: 0;
-    margin: 0;
+	font-size: 1.5rem;
+	height: 2rem;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-right: 0;
+	margin: 0;
 
-    flex: 1;
+	flex: 1;
 
-    grid-row-start: 1;
-    grid-column-start: 1;
+	grid-row-start: 1;
+	grid-column-start: 1;
 }
 
 .TimeRangeInputContainer {
-    grid-row-start: 1;
-    grid-column-start: 1;
-    display: flex;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    pointer-events: none;
+	grid-row-start: 1;
+	grid-column-start: 1;
+	display: flex;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+	pointer-events: none;
 }
 
 .TimeRangeInputContainerVisible {
-    opacity: 1;
-    pointer-events: all;
+	opacity: 1;
+	pointer-events: all;
 }
 
 .TimeRangeInput {
-    -webkit-appearance: none;
-    background: var(--lightGray);
-    -webkit-transition: 0.2s;
-    transition: opacity 0.2s;
+	-webkit-appearance: none;
+	background: var(--lightGray);
+	-webkit-transition: 0.2s;
+	transition: opacity 0.2s;
 }
 
 .TimeRangeInput::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 2rem;
-    height: 2rem;
-    background: var(--accent);
-    cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	width: 2rem;
+	height: 2rem;
+	background: var(--accent);
+	cursor: pointer;
 }
 
 .TimeRangeInputText {
-    background-color: transparent;
-    border: none;
-    outline: none;
-    text-align: center;
-    font-size: 1.5rem;
-    width: 3rem;
-    margin-left: 1rem;
-    margin-right: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	text-align: center;
+	font-size: 1.5rem;
+	width: 3rem;
+	margin-left: 1rem;
+	margin-right: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .ListTaskButton {
-    background-color: transparent;
-    border: none;
-    outline: none;
-    text-align: center;
-    font-size: 1.5rem;
-    width: 3rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.3s ease;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	text-align: center;
+	font-size: 1.5rem;
+	width: 3rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: opacity 0.3s ease;
 }
 
 .ListTaskButton:hover {
-    opacity: 0.5;
+	opacity: 0.5;
 }
 
 .ListTaskTagsContainer {
-    box-sizing: border-box;
-    /* padding: 0.5rem; */
-    /* padding-top: 0; */
-    padding: 0;
+	box-sizing: border-box;
+	/* padding: 0.5rem; */
+	/* padding-top: 0; */
+	padding: 0;
 }
 
 .ListTaskTag {
-    padding: 0.5rem;
-    border: var(--border);
-    display: inline-block;
-    margin-left: 0.5rem;
-    /* margin-top: 0.5rem; */
-    margin-bottom: 0.5rem;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
+	padding: 0.5rem;
+	border: var(--border);
+	display: inline-block;
+	margin-left: 0.5rem;
+	/* margin-top: 0.5rem; */
+	margin-bottom: 0.5rem;
+	user-select: none;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 .ListTaskTagsContainer a {
-    display: inline-block;
-    /* display: block; */
-    height: 100%;
+	display: inline-block;
+	/* display: block; */
+	height: 100%;
 
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
+	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 .CreateTaskContainer {
-    width: 100%;
-    box-sizing: border-box;
-    padding-bottom: var(--margin);
-    padding-left: var(--margin);
-    padding-right: var(--margin);
+	width: 100%;
+	box-sizing: border-box;
+	padding-bottom: var(--margin);
+	padding-left: var(--margin);
+	padding-right: var(--margin);
 }
 
 .CreateTask {
-    display: flex;
-    flex-direction: row;
+	display: flex;
+	flex-direction: row;
 
-    box-sizing: border-box;
-    border: var(--border);
-    width: 100%;
-    padding: none;
+	box-sizing: border-box;
+	border: var(--border);
+	width: 100%;
+	padding: none;
 }
 
 .CreateTaskInputContainer {
-    flex: 1;
-    display: flex;
-    box-sizing: border-box;
-    padding: 0.5rem;
+	flex: 1;
+	display: flex;
+	box-sizing: border-box;
+	padding: 0.5rem;
 }
 .CreateTaskInput {
-    flex: 1;
-    font-size: 1.5rem;
-    border: none;
-    outline: none;
+	flex: 1;
+	font-size: 1.5rem;
+	border: none;
+	outline: none;
 }
 
 .CreateTaskButton {
-    background-color: transparent;
-    border: none;
-    outline: none;
-    text-align: center;
-    font-size: 1.5rem;
-    width: 2.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	text-align: center;
+	font-size: 1.5rem;
+	width: 2.5rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 /* .CreateTaskButton:hover {
@@ -211,220 +211,220 @@ html {
 } */
 
 .HomePage {
-    display: flex;
-    justify-content: center;
-    height: 100vh;
-    overflow: scroll;
+	display: flex;
+	justify-content: center;
+	height: 100vh;
+	overflow: scroll;
 }
 
 .HomePageScrollContainer {
-    /* max-width: 70rem;
+	/* max-width: 70rem;
     min-width: 50%; */
-    width: 100%;
+	width: 100%;
 }
 
 .HomePage::-webkit-scrollbar {
-    display: none;
+	display: none;
 }
 
 .HomePageScrollContainer::-webkit-scrollbar {
-    display: none;
+	display: none;
 }
 
 .ListTaskTagsContainer .react-colorful {
-    width: 100%;
-    /* transform: scale(0.8); */
+	width: 100%;
+	/* transform: scale(0.8); */
 }
 
 .TaskEditFooterContainerContainer {
-    position: fixed;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+	position: fixed;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	bottom: 0;
+	left: 0;
+	width: 100%;
 
-    animation: fadeIn 0.3s 1 alternate ease;
+	animation: fadeIn 0.3s 1 alternate ease;
 }
 .TaskEditFooterContainer {
-    width: 100%;
-    /* max-width: 50rem;
+	width: 100%;
+	/* max-width: 50rem;
     min-width: 50%; */
 
-    box-sizing: border-box;
-    border: var(--border);
-    background-color: white;
-    padding: var(--margin);
-    padding-bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+	box-sizing: border-box;
+	border: var(--border);
+	background-color: white;
+	padding: var(--margin);
+	padding-bottom: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
 }
 
 @media (max-aspect-ratio: 1/1) {
-    .TaskEditFooterContainer {
-        /* max-width: 50rem;
+	.TaskEditFooterContainer {
+		/* max-width: 50rem;
         min-width: 100%; */
-        width: 100%;
-    }
+		width: 100%;
+	}
 }
 .TaskEditFooterContainer button {
-    padding: 1rem;
-    box-sizing: content-box;
-    font-size: 2rem;
+	padding: 1rem;
+	box-sizing: content-box;
+	font-size: 2rem;
 }
 
 .TaskEditFooterContainer div {
-    display: flex;
-    justify-content: center;
+	display: flex;
+	justify-content: center;
 }
 
 .TaskEditFooterContainer p {
-    font-size: 1.5rem;
-    margin-bottom: var(--margin);
+	font-size: 1.5rem;
+	margin-bottom: var(--margin);
 }
 
 .react-colorful {
-    border-radius: 0 !important;
-    border-color: var(--gray);
+	border-radius: 0 !important;
+	border-color: var(--gray);
 }
 
 .react-colorful div {
-    border-radius: 0 !important;
-    border-color: var(--gray);
+	border-radius: 0 !important;
+	border-color: var(--gray);
 }
 
 .react-colorful > div {
-    border: var(--border);
+	border: var(--border);
 }
 
 .HomePageHeaderContainer {
-    width: 100%;
-    padding: var(--margin);
-    /* padding-bottom: 0; */
-    box-sizing: border-box;
+	width: 100%;
+	padding: var(--margin);
+	/* padding-bottom: 0; */
+	box-sizing: border-box;
 }
 
 .HomePageHeader {
-    border: var(--border);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	border: var(--border);
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 .HomePageHeader > div {
-    flex: 1;
+	flex: 1;
 }
 
 .HomePageHeader button {
-    font-size: 2rem;
-    padding: 0.5rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+	font-size: 2rem;
+	padding: 0.5rem;
+	padding-left: 1rem;
+	padding-right: 1rem;
 }
 
 .HeaderPlateLength {
-    font-size: 1.5rem;
-    transition: font-size 0.5s ease;
+	font-size: 1.5rem;
+	transition: font-size 0.5s ease;
 }
 
 .PlatePlaying {
-    font-size: 4rem;
+	font-size: 4rem;
 }
 
 .PlayPlateIcon {
-    transition: width 0.5s ease;
-    width: 2rem;
+	transition: width 0.5s ease;
+	width: 2rem;
 }
 
 .PlayPlateIconPlaying {
-    width: 0;
+	width: 0;
 }
 
 button {
-    background-color: transparent;
-    border: none;
-    outline: none;
-    text-align: center;
-    font-size: 1.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: opacity 0.3s ease;
-    cursor: pointer;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	text-align: center;
+	font-size: 1.5rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: opacity 0.3s ease;
+	cursor: pointer;
 }
 
 button:hover {
-    opacity: 0.5;
+	opacity: 0.5;
 }
 
 a {
-    opacity: 1;
-    transition: opacity 0.3s ease;
+	opacity: 1;
+	transition: opacity 0.3s ease;
 }
 
 a:active {
-    opacity: 0.5;
+	opacity: 0.5;
 }
 
 .TaskEditFooterContainer input {
-    width: 100%;
+	width: 100%;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
 }
 
 .TimeTag {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .DateTag {
-    transition: background-color 0.01s ease;
+	transition: background-color 0.01s ease;
 }
 
 .AuthPage {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 2rem);
-    justify-content: center;
-    align-items: center;
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 2rem);
+	justify-content: center;
+	align-items: center;
 }
 
 .AuthPage div {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 
 .AuthPage button {
-    border: var(--border);
-    padding: 0.5rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+	border: var(--border);
+	padding: 0.5rem;
+	padding-left: 1rem;
+	padding-right: 1rem;
 }
 
 .AuthPage h1 {
-    font-size: 2rem;
-    margin-bottom: var(--margin);
+	font-size: 2rem;
+	margin-bottom: var(--margin);
 }
 
 .AuthPage p {
-    font-size: 1rem;
+	font-size: 1rem;
 }
 
 .safariButton {
-    background-color: #fefefe;
+	background-color: #fefefe;
 }
 
 .SubTaskListContainer {
-    margin-top: 0.5rem;
+	margin-top: 0.5rem;
 }
