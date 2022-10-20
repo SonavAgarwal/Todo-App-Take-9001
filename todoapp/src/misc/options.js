@@ -1,7 +1,7 @@
 import { deleteField } from "firebase/firestore";
 import isUrl from "is-url";
 
-export const versionNumber = 1.9;
+export const versionNumber = "1.10";
 
 export const typeOptions = ["long", "short", "email", "list", "thought"]; // order controls sorted order
 export const typeOptionsDisplay = { thought: "💡", email: "📧" };
