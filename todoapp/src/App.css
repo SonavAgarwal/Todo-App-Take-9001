@@ -253,7 +253,7 @@ html {
     min-width: 50%; */
 
 	box-sizing: border-box;
-	border: var(--border);
+	border-top: var(--border);
 	background-color: white;
 	padding: var(--margin);
 	padding-bottom: 0;

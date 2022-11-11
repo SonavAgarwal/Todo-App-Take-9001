@@ -1,7 +1,7 @@
 import { deleteField } from "firebase/firestore";
 import isUrl from "is-url";
 
-export const versionNumber = "1.10";
+export const versionNumber = "1.11";
 
 export const typeOptions = ["long", "short", "email", "list", "thought"]; // order controls sorted order
 export const typeOptionsDisplay = { thought: "💡", email: "📧" };
@@ -66,6 +66,7 @@ export function parseNewTextToUpdateObject(changedText) {
 					dayDifference += 7;
 				}
 				let dueDate = new Date();
+				dueDate.setHours(0, 0, 0, 0);
 				dueDate.setDate(dueDate.getDate() + dayDifference);
 				updateObject.date = dueDate;
 			} else if (tag === "/") {
