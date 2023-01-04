@@ -125,10 +125,17 @@ html {
 	justify-content: center;
 	align-items: center;
 	transition: opacity 0.3s ease;
+
+	position: relative;
 }
 
 .ListTaskButton:hover {
 	opacity: 0.5;
+}
+
+/* fixes visibility on Safari */
+.ListTaskButton > svg {
+	position: absolute;
 }
 
 .ListTaskTagsContainer {
@@ -353,6 +360,7 @@ button {
 	align-items: center;
 	transition: opacity 0.3s ease;
 	cursor: pointer;
+	color: black;
 }
 
 button:hover {
@@ -419,10 +427,6 @@ a:active {
 
 .AuthPage p {
 	font-size: 1rem;
-}
-
-.safariButton {
-	background-color: #fefefe;
 }
 
 .SubTaskListContainer {
