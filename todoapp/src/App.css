@@ -2,18 +2,37 @@
 
 * {
 	font-family: "Space Mono", sans-serif;
+	color: var(--black);
 }
 
 html {
+	background-color: var(--background);
 	scroll-behavior: smooth;
 }
 
+@media (prefers-color-scheme: light) {
+	:root {
+		--lightGray: #dedede;
+		--gray: #3c3c3c;
+		--accent: #4287f5;
+		--black: black;
+		--background: white;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--lightGray: #222222;
+		--gray: #2e2e2e;
+		--accent: #4287f5;
+		--black: rgb(222 222 222);
+		--background: rgb(0 0 0);
+	}
+}
+
 :root {
-	--lightGray: rgb(222, 222, 222);
-	--gray: #3c3c3c;
-	--accent: #4287f5;
-	--border: 2px solid var(--gray);
 	--margin: 1rem;
+	--border: 2px solid var(--gray);
 }
 
 .TaskList {
@@ -21,7 +40,7 @@ html {
 }
 
 .ListTaskContainer {
-	background-color: white;
+	background-color: var(--background);
 
 	overflow: hidden;
 	border: var(--border);
@@ -125,6 +144,7 @@ html {
 	justify-content: center;
 	align-items: center;
 	transition: opacity 0.3s ease;
+	color: var(--black);
 
 	position: relative;
 }
@@ -157,6 +177,7 @@ html {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	user-select: none;
+	color: black;
 }
 
 .ListTaskTagsContainer a {
@@ -199,6 +220,7 @@ html {
 	font-size: 1.5rem;
 	border: none;
 	outline: none;
+	background-color: transparent;
 }
 
 .CreateTaskButton {
@@ -252,6 +274,8 @@ html {
 	left: 0;
 	width: 100%;
 
+	z-index: 100;
+
 	animation: fadeIn 0.3s 1 alternate ease;
 }
 .TaskEditFooterContainer {
@@ -261,7 +285,7 @@ html {
 
 	box-sizing: border-box;
 	border-top: var(--border);
-	background-color: white;
+	background-color: var(--background);
 	padding: var(--margin);
 	padding-bottom: 0;
 	display: flex;
@@ -290,6 +314,11 @@ html {
 
 .TaskEditFooterContainer p {
 	font-size: 1.5rem;
+	margin-bottom: var(--margin);
+}
+
+.TaskEditFooterContainerButtons {
+	margin-top: var(--margin);
 	margin-bottom: var(--margin);
 }
 
@@ -360,7 +389,7 @@ button {
 	align-items: center;
 	transition: opacity 0.3s ease;
 	cursor: pointer;
-	color: black;
+	color: var(--black);
 }
 
 button:hover {
@@ -391,6 +420,7 @@ a:active {
 
 .TimeTag {
 	cursor: pointer;
+	color: var(--black);
 }
 
 .DateTag {

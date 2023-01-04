@@ -357,7 +357,7 @@ function ListTaskTag({ taskListId, task, property, dragging, taskId }) {
 								color={color}
 								onChange={setColor}
 							></HexColorPicker>
-							<div>
+							<div className="TaskEditFooterContainerButtons">
 								<button
 									className="ListTaskButton"
 									onClick={function () {
@@ -453,7 +453,7 @@ function ListTaskTag({ taskListId, task, property, dragging, taskId }) {
 								className="ListTaskText TimeRangeInput"
 								tabIndex={-1}
 							></input>
-							<div>
+							<div className="TaskEditFooterContainerButtons">
 								<button
 									className="ListTaskButton"
 									onClick={function () {
