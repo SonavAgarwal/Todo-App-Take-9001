@@ -11,7 +11,11 @@ import {
 	updateDoc,
 } from "firebase/firestore";
 import { v4 as uuidv4 } from "uuid";
-import { defaultTask, parseNewTextToUpdateObject } from "./misc/options";
+import {
+	defaultTask,
+	mainTaskListName,
+	parseNewTextToUpdateObject,
+} from "./misc/options";
 
 export const firebaseConfig = {
 	apiKey: "AIzaSyCF7OvgCxXof4ZYWlPWDud9eHGy7byiO4k",
@@ -45,9 +49,16 @@ export function createTask(taskList, text) {
 		order: arrayUnion(taskUuid),
 	};
 
-	let taskUpdateObject = parseNewTextToUpdateObject(text);
+	let taskUpdateObject = {};
+
+	if (taskList !== mainTaskListName) {
+		taskUpdateObject.type = "short";
+	}
+
+	Object.assign(taskUpdateObject, parseNewTextToUpdateObject(text));
+
 	// prevent deep nested tasks
-	if (taskList !== "tasks") {
+	if (taskList !== mainTaskListName) {
 		// taskUpdateObject.type = defaultTask.type; // why tf was this here
 		taskUpdateObject.wasList = false; // todo wastes storage space
 	}

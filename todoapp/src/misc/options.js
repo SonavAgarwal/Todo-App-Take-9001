@@ -1,7 +1,8 @@
 import { deleteField } from "firebase/firestore";
 import isUrl from "is-url";
 
-export const versionNumber = "1.11";
+export const versionNumber = "1.14";
+export const mainTaskListName = "tasks";
 
 export const typeOptions = ["long", "short", "email", "list", "thought"]; // order controls sorted order
 export const typeOptionsDisplay = { thought: "💡", email: "📧" };
@@ -71,6 +72,15 @@ export function parseNewTextToUpdateObject(changedText) {
 				updateObject.date = dueDate;
 			} else if (tag === "/") {
 				updateObject.date = deleteField();
+			} else if (tag.toLowerCase() === "check") {
+				updateObject.plate = true;
+			} else if (tag.toLowerCase() === "uncheck") {
+				updateObject.plate = false;
+			} else if (
+				tag.charAt(0).toLowerCase() == "t" &&
+				!isNaN(tag.substring(1))
+			) {
+				updateObject.length = parseInt(tag.substring(1));
 			} else if (isUrl(tag)) {
 				updateObject.link = tag;
 			} else {
