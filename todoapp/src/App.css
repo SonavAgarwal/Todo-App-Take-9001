@@ -33,6 +33,7 @@ html {
 :root {
 	--margin: 1rem;
 	--border: 2px solid var(--gray);
+	--border-radius: 0.5rem;
 }
 
 .TaskList {
@@ -48,6 +49,9 @@ html {
 	margin-bottom: var(--margin);
 	margin-left: var(--margin);
 	margin-right: var(--margin);
+
+	border-radius: var(--border-radius);
+
 	/* transition: height 500ms ease; */
 }
 
@@ -108,6 +112,7 @@ html {
 	background: var(--lightGray);
 	-webkit-transition: 0.2s;
 	transition: opacity 0.2s;
+	border-radius: var(--border-radius);
 }
 
 .TimeRangeInput::-webkit-slider-thumb {
@@ -117,6 +122,7 @@ html {
 	height: 2rem;
 	background: var(--accent);
 	cursor: pointer;
+	border-radius: var(--border-radius);
 }
 
 .TimeRangeInputText {
@@ -178,6 +184,8 @@ html {
 	-webkit-user-select: none;
 	user-select: none;
 	color: black;
+
+	border-radius: calc(var(--border-radius) / 2);
 }
 
 .ListTaskTagsContainer a {
@@ -205,6 +213,7 @@ html {
 
 	box-sizing: border-box;
 	border: var(--border);
+	border-radius: var(--border-radius);
 	width: 100%;
 	padding: none;
 }
@@ -323,17 +332,30 @@ html {
 }
 
 .react-colorful {
-	border-radius: 0 !important;
+	/* border-radius: 0 !important; */
+	border-radius: var(--border-radius) !important;
 	border-color: var(--gray);
 }
 
 .react-colorful div {
-	border-radius: 0 !important;
+	border-radius: var(--border-radius) !important;
 	border-color: var(--gray);
 }
 
 .react-colorful > div {
 	border: var(--border);
+}
+
+.react-colorful__saturation-pointer {
+	background-color: transparent !important;
+}
+
+.react-colorful__hue-pointer {
+	background-color: transparent !important;
+}
+
+.react-colorful__pointer-fill {
+	border-radius: 0 !important;
 }
 
 .HomePageHeaderContainer {
@@ -345,6 +367,8 @@ html {
 
 .HomePageHeader {
 	border: var(--border);
+	border-radius: var(--border-radius);
+
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -390,6 +414,7 @@ button {
 	transition: opacity 0.3s ease;
 	cursor: pointer;
 	color: var(--black);
+	border-radius: var(--border-radius);
 }
 
 button:hover {
