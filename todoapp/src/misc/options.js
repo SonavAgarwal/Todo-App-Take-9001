@@ -1,7 +1,7 @@
 import { deleteField } from "firebase/firestore";
 import isUrl from "is-url";
 
-export const versionNumber = "1.16";
+export const versionNumber = "1.17";
 export const mainTaskListName = "tasks";
 
 export const typeOptions = ["long", "short", "email", "list", "thought"]; // order controls sorted order
