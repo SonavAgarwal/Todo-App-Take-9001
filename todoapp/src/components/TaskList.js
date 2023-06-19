@@ -18,6 +18,7 @@ import { SortableListTask } from "./SortableListTask";
 import { updateTaskOrder } from "../firebase";
 import { debounce } from "debounce";
 import { typeOptions } from "../misc/options";
+import NoTasksSvg from "../assets/NoTasks";
 
 function TaskList({ taskListId, tasks, order, sortBy }) {
 	const [activeId, setActiveId] = useState(null);
@@ -131,6 +132,11 @@ function TaskList({ taskListId, tasks, order, sortBy }) {
 
 	return (
 		<div className="TaskList">
+			{listOrder.length === 0 && (
+				<div className="TaskListEmpty">
+					<NoTasksSvg />
+				</div>
+			)}
 			<DndContext
 				sensors={sensors}
 				collisionDetection={closestCenter}

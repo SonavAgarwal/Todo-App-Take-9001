@@ -32,12 +32,31 @@ html {
 
 :root {
 	--margin: 1rem;
-	--border: 2px solid var(--gray);
+	--border-width: 2px;
+	--border: var(--border-width) solid var(--gray);
 	--border-radius: 0.5rem;
 }
 
 .TaskList {
 	/* padding-top: var(--margin); */
+	min-height: calc(100vh - 10.25rem);
+	display: flex;
+	flex-direction: column;
+}
+
+.TaskListEmpty {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	justify-self: center;
+	min-height: calc(100vh - 12rem);
+	width: 100%;
+	margin-bottom: var(--margin);
+}
+
+.TaskListEmpty path {
+	stroke: var(--gray);
+	stroke-width: var(--border-width);
 }
 
 .ListTaskContainer {
@@ -389,6 +408,17 @@ html {
 	transition: font-size 0.5s ease;
 }
 
+.HomePageHeader .HeaderChangeTaskList {
+	font-size: 1.2rem;
+	transition: all 0.3s ease;
+	color: var(--gray);
+}
+
+.HomePageHeader .HeaderChangeTaskList > svg {
+	color: red !important;
+	stroke: var(--gray);
+}
+
 .PlatePlaying {
 	font-size: 4rem;
 }
@@ -486,4 +516,12 @@ a:active {
 
 .SubTaskListContainer {
 	margin-top: 0.5rem;
+}
+
+.Loading {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: var(--margin);
 }

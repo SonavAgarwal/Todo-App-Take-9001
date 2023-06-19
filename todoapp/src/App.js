@@ -10,35 +10,36 @@ import Auth from "./pages/Auth";
 import Home from "./pages/Home";
 
 function AppWrapper() {
-    return (
-        <BrowserRouter>
-            <App></App>
-        </BrowserRouter>
-    );
+	return (
+		<BrowserRouter>
+			<App></App>
+		</BrowserRouter>
+	);
 }
 
 function App() {
-    const [user] = useAuthState(auth); // loading, error
+	const [user, loading, error] = useAuthState(auth); // loading, error
 
-    const navigate = useNavigate();
+	const navigate = useNavigate();
 
-    useEffect(
-        function () {
-            if (user) {
-                navigate("/");
-            } else {
-                navigate("/auth");
-            }
-        },
-        [user, navigate]
-    );
+	useEffect(
+		function () {
+			if (loading) return;
+			if (user) {
+				navigate("/");
+			} else {
+				navigate("/auth");
+			}
+		},
+		[user, navigate]
+	);
 
-    return (
-        <Routes>
-            <Route path='/' element={<Home />} />
-            <Route path='/auth' element={<Auth />} />
-        </Routes>
-    );
+	return (
+		<Routes>
+			<Route path="/" element={<Home />} />
+			<Route path="/auth" element={<Auth />} />
+		</Routes>
+	);
 }
 
 export default AppWrapper;

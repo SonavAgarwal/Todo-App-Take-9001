@@ -6,213 +6,303 @@ import { useDocumentData } from "react-firebase-hooks/firestore";
 import { auth, createTask, firestore, updateTask } from "../firebase";
 import { useForm } from "react-hook-form";
 import TaskList from "../components/TaskList";
-import { BiCalendarAlt, BiCategoryAlt, BiCheckSquare, BiFontFamily, BiLogOut, BiMenu, BiPlay, BiPlus, BiPointer, BiTime } from "react-icons/bi";
+import {
+	BiCalendarAlt,
+	BiCategoryAlt,
+	BiCheckSquare,
+	BiFontFamily,
+	BiLeftArrow,
+	BiLogOut,
+	BiMenu,
+	BiPlay,
+	BiPlus,
+	BiPointer,
+	BiRightArrow,
+	BiTime,
+} from "react-icons/bi";
 import { lengthCountedTags, lengthStep } from "../misc/options";
+import { Oval } from "react-loader-spinner";
+import { useMediaQuery } from "../misc/useMediaQuery";
 
 export const NewTaskContext = createContext();
 export const UserConfigContext = createContext();
 
 const sortIcons = [
-    { sortBy: "none", icon: <BiPointer /> },
-    { sortBy: "plate", icon: <BiCheckSquare /> },
-    { sortBy: "tag", icon: <BiCategoryAlt /> },
-    { sortBy: "type", icon: <BiMenu /> },
-    { sortBy: "length", icon: <BiTime /> },
-    { sortBy: "date", icon: <BiCalendarAlt /> },
-    { sortBy: "text", icon: <BiFontFamily /> },
+	{ sortBy: "none", icon: <BiPointer /> },
+	{ sortBy: "plate", icon: <BiCheckSquare /> },
+	{ sortBy: "tag", icon: <BiCategoryAlt /> },
+	{ sortBy: "type", icon: <BiMenu /> },
+	{ sortBy: "length", icon: <BiTime /> },
+	{ sortBy: "date", icon: <BiCalendarAlt /> },
+	{ sortBy: "text", icon: <BiFontFamily /> },
 ];
 
 function Home(props) {
-    const [user] = useAuthState(auth);
-    const [tasks, tasksLoading] = useDocumentData(doc(firestore, `users/${user?.uid}/data/tasks`));
-    const [userConfig] = useDocumentData(doc(firestore, `users/${user?.uid}/data/config`));
+	const isMobile = useMediaQuery("(max-width: 600px)");
+	console.log("isMobile: ", isMobile);
 
-    const [listOrder, setListOrder] = useState(tasks?.order);
-    useEffect(
-        function () {
-            setListOrder(tasks?.order);
-        },
-        [tasks]
-    );
+	const [user, userLoading] = useAuthState(auth);
+	const [tasks, tasksLoading] = useDocumentData(
+		doc(firestore, `users/${user?.uid}/data/tasks`)
+	);
+	const [userConfig] = useDocumentData(
+		doc(firestore, `users/${user?.uid}/data/config`)
+	);
 
-    const [sortBy, setSortBy] = useState("none");
+	const [listOrder, setListOrder] = useState(tasks?.order);
+	useEffect(
+		function () {
+			setListOrder(tasks?.order);
+		},
+		[tasks]
+	);
 
-    const newTaskRef = useRef();
+	const [sortBy, setSortBy] = useState("none");
 
-    function focusNewTask() {
-        setFocus("text");
-    }
+	const newTaskRef = useRef();
 
-    const { register, handleSubmit, reset, setFocus } = useForm();
+	function focusNewTask() {
+		setFocus("text");
+	}
 
-    function onSubmit(data) {
-        createTask("tasks", data.text);
-        reset();
-        setTimeout(() => {
-            newTaskRef.current.scrollIntoView();
-        }, 500);
-    }
+	const { register, handleSubmit, reset, setFocus } = useForm();
 
-    const [plateLength, setPlateLength] = useState(0);
-    const [plateColon, setPlateColon] = useState(true);
-    const [platePlaying, setPlatePlaying] = useState(false);
+	function onSubmit(data) {
+		createTask("tasks", data.text);
+		reset();
+		setTimeout(() => {
+			newTaskRef.current.scrollIntoView();
+		}, 500);
+	}
 
-    useEffect(
-        function () {
-            console.log("Tasks: ", tasks);
+	const [plateLength, setPlateLength] = useState(0);
+	const [plateColon, setPlateColon] = useState(true);
+	const [platePlaying, setPlatePlaying] = useState(false);
 
-            if (tasks) {
-                let plateLengthTotal = 0;
-                for (let taskId of tasks.order) {
-                    if (tasks[taskId]?.plate && lengthCountedTags.includes(tasks[taskId].type)) {
-                        plateLengthTotal += parseInt(tasks[taskId].length);
-                    }
-                }
-                setPlateLength(plateLengthTotal);
-            }
-        },
-        [tasks]
-    );
+	useEffect(
+		function () {
+			console.log("Tasks: ", tasks);
 
-    useEffect(
-        function () {
-            if (platePlaying) {
-                let interval = setInterval(() => {
-                    setPlateColon(false);
-                    setTimeout(() => {
-                        setPlateColon(true);
-                    }, 500);
-                }, 1000);
+			if (tasks) {
+				let plateLengthTotal = 0;
+				for (let taskId of tasks.order) {
+					if (
+						tasks[taskId]?.plate &&
+						lengthCountedTags.includes(tasks[taskId].type)
+					) {
+						plateLengthTotal += parseInt(tasks[taskId].length);
+					}
+				}
+				setPlateLength(plateLengthTotal);
+			}
+		},
+		[tasks]
+	);
 
-                return function () {
-                    clearInterval(interval);
-                };
-            }
-        },
-        [platePlaying]
-    );
+	useEffect(
+		function () {
+			if (platePlaying) {
+				let interval = setInterval(() => {
+					setPlateColon(false);
+					setTimeout(() => {
+						setPlateColon(true);
+					}, 500);
+				}, 1000);
 
-    useEffect(
-        function () {
-            if (platePlaying) {
-                function findNextTaskId() {
-                    let nextTaskId = tasks.order.find(function (taskId) {
-                        let task = tasks[taskId];
-                        return task.plate && parseInt(task.length) >= lengthStep;
-                    });
-                    // let nextTask = tasks[nextTaskId];
-                    return nextTaskId;
-                }
+				return function () {
+					clearInterval(interval);
+				};
+			}
+		},
+		[platePlaying]
+	);
 
-                console.log(findNextTaskId());
+	useEffect(
+		function () {
+			if (platePlaying) {
+				function findNextTaskId() {
+					let nextTaskId = tasks.order.find(function (taskId) {
+						let task = tasks[taskId];
+						return task.plate && parseInt(task.length) >= lengthStep;
+					});
+					// let nextTask = tasks[nextTaskId];
+					return nextTaskId;
+				}
 
-                if (!findNextTaskId()) {
-                    setPlatePlaying(false);
-                    return;
-                }
+				console.log(findNextTaskId());
 
-                let interval = setInterval(() => {
-                    let nextTaskId = findNextTaskId();
+				if (!findNextTaskId()) {
+					setPlatePlaying(false);
+					return;
+				}
 
-                    if (!nextTaskId) {
-                        setPlatePlaying(false);
-                        return;
-                    }
+				let interval = setInterval(() => {
+					let nextTaskId = findNextTaskId();
 
-                    updateTask("tasks", nextTaskId, { length: increment(-1 * lengthStep) });
-                }, lengthStep * 60 * 1000);
+					if (!nextTaskId) {
+						setPlatePlaying(false);
+						return;
+					}
 
-                return function () {
-                    clearInterval(interval);
-                };
-            }
-        },
-        [platePlaying, tasks]
-    );
+					updateTask("tasks", nextTaskId, {
+						length: increment(-1 * lengthStep),
+					});
+				}, lengthStep * 60 * 1000);
 
-    return (
-        <UserConfigContext.Provider value={userConfig}>
-            <NewTaskContext.Provider value={focusNewTask}>
-                <div className='HomePage'>
-                    <div className='HomePageScrollContainer'>
-                        <div className='HomePageHeaderContainer'>
-                            <div className='HomePageHeader'>
-                                <button
-                                    onClick={function () {
-                                        signOut(auth);
-                                    }}
-                                    tabIndex={-1}>
-                                    <BiLogOut />
-                                </button>
-                                <div></div>
-                                <button
-                                    onClick={function () {
-                                        if (!platePlaying && plateLength < lengthStep) return;
-                                        setPlatePlaying(!platePlaying);
-                                    }}
-                                    tabIndex={-1}>
-                                    {<BiPlay className={`PlayPlateIcon ${platePlaying ? "PlayPlateIconPlaying" : ""}`} />}
-                                    <p className={`HeaderPlateLength ${platePlaying ? "PlatePlaying" : ""}`}>
-                                        {Math.floor(plateLength / 60)}
-                                        {plateColon ? ":" : " "}
-                                        {plateLength % 60 < 10 ? "0" : ""}
-                                        {plateLength % 60}
-                                    </p>
-                                </button>
+				return function () {
+					clearInterval(interval);
+				};
+			}
+		},
+		[platePlaying, tasks]
+	);
 
-                                <div></div>
-                                {<SortByButton sortBy={sortBy} setSortBy={setSortBy} />}
-                            </div>
-                        </div>
-                        {!tasksLoading && <TaskList taskListId={"tasks"} tasks={tasks} order={listOrder} sortBy={sortBy}></TaskList>}
-                        <div className='CreateTaskContainer' ref={newTaskRef}>
-                            <form className='CreateTask' onSubmit={handleSubmit(onSubmit)}>
-                                <div className='CreateTaskInputContainer'>
-                                    <input
-                                        className='CreateTaskInput'
-                                        placeholder='new task...'
-                                        autoComplete='off'
-                                        onFocus={function (event) {
-                                            event.target.scrollIntoView();
-                                        }}
-                                        {...register("text")}
-                                    />
-                                </div>
-                                <button className='CreateTaskButton' type='submit' tabIndex={-1}>
-                                    <BiPlus />
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </NewTaskContext.Provider>
-        </UserConfigContext.Provider>
-    );
+	return (
+		<UserConfigContext.Provider value={userConfig}>
+			<NewTaskContext.Provider value={focusNewTask}>
+				<div className="HomePage">
+					<div className="HomePageScrollContainer">
+						<div className="HomePageHeaderContainer">
+							<div className="HomePageHeader">
+								<button
+									onClick={function () {
+										signOut(auth);
+									}}
+									tabIndex={-1}
+								>
+									<BiLogOut />
+								</button>
+								<div></div>
+								{/* {!isMobile && (
+									<button
+										className="HeaderChangeTaskList"
+										onClick={function () {
+											signOut(auth);
+										}}
+										tabIndex={-1}
+									>
+										<BiLeftArrow />
+									</button>
+								)} */}
+								<button
+									onClick={function () {
+										if (!platePlaying && plateLength < lengthStep) return;
+										setPlatePlaying(!platePlaying);
+									}}
+									tabIndex={-1}
+								>
+									{
+										<BiPlay
+											className={`PlayPlateIcon ${
+												platePlaying ? "PlayPlateIconPlaying" : ""
+											}`}
+										/>
+									}
+									<p
+										className={`HeaderPlateLength ${
+											platePlaying ? "PlatePlaying" : ""
+										}`}
+									>
+										{Math.floor(plateLength / 60)}
+										{plateColon ? ":" : " "}
+										{plateLength % 60 < 10 ? "0" : ""}
+										{plateLength % 60}
+									</p>
+								</button>
+								{/* {!isMobile && (
+									<button
+										className="HeaderChangeTaskList"
+										onClick={function () {
+											signOut(auth);
+										}}
+										tabIndex={-1}
+									>
+										<BiRightArrow />
+									</button>
+								)} */}
+								<div></div>
+								{<SortByButton sortBy={sortBy} setSortBy={setSortBy} />}
+							</div>
+						</div>
+
+						{(tasksLoading || userLoading) && (
+							<div className="Loading">
+								<Oval
+									height={50}
+									width={50}
+									color="var(--black)"
+									wrapperStyle={{}}
+									wrapperClass=""
+									visible={true}
+									ariaLabel="oval-loading"
+									secondaryColor="var(--gray)"
+									strokeWidth={0}
+									strokeWidthSecondary={2}
+								/>
+							</div>
+						)}
+
+						{!tasksLoading && (
+							<TaskList
+								taskListId={"tasks"}
+								tasks={tasks}
+								order={listOrder}
+								sortBy={sortBy}
+							></TaskList>
+						)}
+						<div className="CreateTaskContainer" ref={newTaskRef}>
+							<form className="CreateTask" onSubmit={handleSubmit(onSubmit)}>
+								<div className="CreateTaskInputContainer">
+									<input
+										className="CreateTaskInput"
+										placeholder="new task..."
+										autoComplete="off"
+										onFocus={function (event) {
+											event.target.scrollIntoView();
+										}}
+										{...register("text")}
+									/>
+								</div>
+								<button
+									className="CreateTaskButton"
+									type="submit"
+									tabIndex={-1}
+								>
+									<BiPlus />
+								</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</NewTaskContext.Provider>
+		</UserConfigContext.Provider>
+	);
 }
 
 function SortByButton({ sortBy, setSortBy }) {
-    let currentSortBy = sortIcons.find(function (item) {
-        return item.sortBy === sortBy;
-    });
+	let currentSortBy = sortIcons.find(function (item) {
+		return item.sortBy === sortBy;
+	});
 
-    let nextIndex =
-        (1 +
-            sortIcons.findIndex(function (icon) {
-                return sortBy === icon.sortBy;
-            })) %
-        sortIcons.length;
+	let nextIndex =
+		(1 +
+			sortIcons.findIndex(function (icon) {
+				return sortBy === icon.sortBy;
+			})) %
+		sortIcons.length;
 
-    let nextSortBy = sortIcons[nextIndex].sortBy;
+	let nextSortBy = sortIcons[nextIndex].sortBy;
 
-    return (
-        <button
-            onClick={function () {
-                setSortBy(nextSortBy);
-            }}
-            tabIndex={-1}>
-            {currentSortBy.icon}
-        </button>
-    );
+	return (
+		<button
+			onClick={function () {
+				setSortBy(nextSortBy);
+			}}
+			tabIndex={-1}
+		>
+			{currentSortBy.icon}
+		</button>
+	);
 }
 
 export default Home;
