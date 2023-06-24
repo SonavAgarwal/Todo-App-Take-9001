@@ -20,7 +20,7 @@ import { debounce } from "debounce";
 import { typeOptions } from "../misc/options";
 import NoTasksSvg from "../assets/NoTasks";
 
-function TaskList({ taskListId, tasks, order, sortBy }) {
+function TaskList({ main, taskListId, tasks, order, sortBy }) {
 	const [activeId, setActiveId] = useState(null);
 	const [listOrder, setListOrder] = useState(order);
 	const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
@@ -131,8 +131,8 @@ function TaskList({ taskListId, tasks, order, sortBy }) {
 	if (!isIterable(listOrder)) return null;
 
 	return (
-		<div className="TaskList">
-			{listOrder.length === 0 && (
+		<div className={"TaskList" + (main ? " TaskListMain" : "")}>
+			{listOrder.length === 0 && main && (
 				<div className="TaskListEmpty">
 					<NoTasksSvg />
 				</div>

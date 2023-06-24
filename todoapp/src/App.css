@@ -39,9 +39,12 @@ html {
 
 .TaskList {
 	/* padding-top: var(--margin); */
-	min-height: calc(100vh - 10.25rem);
 	display: flex;
 	flex-direction: column;
+}
+
+.TaskListMain {
+	min-height: calc(100vh - 10.25rem);
 }
 
 .TaskListEmpty {

@@ -244,6 +244,7 @@ function Home(props) {
 
 						{!tasksLoading && (
 							<TaskList
+								main={true}
 								taskListId={"tasks"}
 								tasks={tasks}
 								order={listOrder}
