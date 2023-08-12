@@ -15,7 +15,7 @@ import {
 } from "@dnd-kit/sortable";
 import ListTask from "./ListTask";
 import { SortableListTask } from "./SortableListTask";
-import { updateTaskOrder } from "../firebase";
+import { updateTaskOrder } from "../firebase.ts";
 import { debounce } from "debounce";
 import { typeOptions } from "../misc/options";
 import NoTasksSvg from "../assets/NoTasks";

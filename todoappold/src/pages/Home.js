@@ -3,7 +3,7 @@ import { doc, increment } from "firebase/firestore";
 import React, { createContext, useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocumentData } from "react-firebase-hooks/firestore";
-import { auth, createTask, firestore, updateTask } from "../firebase";
+import { auth, createTask, firestore, updateTask } from "../firebase.ts";
 import { useForm } from "react-hook-form";
 import TaskList from "../components/TaskList";
 import {

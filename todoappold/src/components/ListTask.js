@@ -6,7 +6,7 @@ import React, {
 	useEffect,
 	useState,
 } from "react";
-import { deleteTask, updateTask } from "../firebase";
+import { deleteTask, updateTask } from "../firebase.ts";
 import {
 	lengthCountedTags,
 	parseNewTextToUpdateObject,
