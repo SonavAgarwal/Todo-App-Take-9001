@@ -1,7 +1,7 @@
 import React from "react";
 import { useSignInWithGoogle } from "react-firebase-hooks/auth";
-import { auth } from "../firebase.ts";
-import { versionNumber } from "../misc/options";
+import { auth } from "../firebase.js";
+import { versionNumber } from "../misc/options.js";
 
 function Auth(props) {
 	const [signInWithGoogle] = useSignInWithGoogle(auth);

@@ -1,17 +1,16 @@
-import React from "react";
-import ListTask from "./ListTask";
-import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
-import { SortMethod } from "../misc/types";
+import { CSS } from "@dnd-kit/utilities";
+import { TaskField } from "../misc/types";
+import TaskComponent from "./TaskComponent";
 
 interface Props {
 	id: string;
-	taskId: string;
-	taskListId: string;
+	taskID: string;
+	taskListID: string;
 	dragging: boolean;
-	sortBy: SortMethod;
+	sortBy: TaskField;
 }
-export function SortableListTask(props: Props) {
+export function SortableTaskComponent(props: Props) {
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({ id: props.id });
 
@@ -22,12 +21,12 @@ export function SortableListTask(props: Props) {
 	};
 
 	return (
-		<ListTask
+		<TaskComponent
 			ref={setNodeRef}
 			style={style}
-			attributes={attributes}
-			listeners={listeners}
+			dragHandleAttributes={attributes}
+			dragHandleListeners={listeners}
 			{...props}
-		></ListTask>
+		></TaskComponent>
 	);
 }

@@ -3,9 +3,9 @@ import { doc, increment } from "firebase/firestore";
 import React, { createContext, useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocumentData } from "react-firebase-hooks/firestore";
-import { auth, createTask, firestore, updateTask } from "../firebase.ts";
+import { auth, createTask, firestore, updateTask } from "../firebase.js";
 import { useForm } from "react-hook-form";
-import TaskList from "../components/TaskList";
+import TaskList from "../components/TaskList.js";
 import {
 	BiCalendarAlt,
 	BiCategoryAlt,
@@ -20,9 +20,9 @@ import {
 	BiRightArrow,
 	BiTime,
 } from "react-icons/bi";
-import { lengthCountedTags, lengthStep } from "../misc/options";
+import { lengthCountedTags, lengthStep } from "../misc/options.js";
 import { Oval } from "react-loader-spinner";
-import { useMediaQuery } from "../misc/useMediaQuery";
+import { useMediaQuery } from "../misc/useMediaQuery.js";
 
 export const NewTaskContext = createContext();
 export const UserConfigContext = createContext();
@@ -68,7 +68,7 @@ function Home(props) {
 	const { register, handleSubmit, reset, setFocus } = useForm();
 
 	function onSubmit(data) {
-		createTask("tasks", data.text);
+		createTask(MAIN_TASK_LIST_NAME, data.text);
 		reset();
 		setTimeout(() => {
 			newTaskRef.current.scrollIntoView();

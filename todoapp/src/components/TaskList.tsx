@@ -1,6 +1,5 @@
 import {
 	DndContext,
-	DragCancelEvent,
 	DragEndEvent,
 	DragOverlay,
 	DragStartEvent,
@@ -15,31 +14,39 @@ import {
 	arrayMove,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { Oval } from "react-loader-spinner";
+// @ts-ignore
 import NoTasksSvg from "../assets/NoTasks";
 import { updateTaskOrder } from "../firebase.ts";
-import { SortMethod } from "../misc/types.ts";
+import { MAIN_TASK_LIST_NAME, TYPE_OPTIONS } from "../misc/options.ts";
+import { TaskField } from "../misc/types.ts";
 import { useTaskList } from "../misc/useTaskList.ts";
-import ListTask from "./ListTask";
-import { SortableListTask } from "./SortableListTask";
-import classNames from "classnames";
+import { SortableTaskComponent } from "./SortableTaskComponent.tsx";
+import TaskComponent from "./TaskComponent.tsx";
+import AnimateHeight from "react-animate-height";
 
 function TaskList({
 	taskListID,
 	sortBy,
+	showLoading = false,
+	open = true,
 }: {
 	taskListID: string;
-	sortBy: SortMethod;
+	sortBy: TaskField;
+	showLoading?: boolean;
+	open?: boolean;
 }) {
-	const isMain = taskListID === "tasks";
+	const isMain = taskListID === MAIN_TASK_LIST_NAME;
 
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
-	const { taskList } = useTaskList(taskListID);
+	const { taskList, loading } = useTaskList(taskListID);
 
-	const [listOrder, setListOrder] = useState<string[]>([]);
+	const [listOrder, setListOrder] = useState<string[] | undefined>();
 	useEffect(
 		function () {
 			if (!taskList) return;
@@ -51,6 +58,7 @@ function TaskList({
 	// ===================
 	// Save the order of the tasks to the database
 	// ===================
+
 	const saveOrder = useDebouncedCallback((newOrder: string[]) => {
 		if (!newOrder) return;
 		const changed = taskList?.order?.some((val, idx) => val !== newOrder[idx]);
@@ -61,6 +69,7 @@ function TaskList({
 	useEffect(
 		function () {
 			if (!taskList) return;
+			if (!listOrder) return;
 			if (taskList.order.length === 0) return;
 			if (listOrder.length === 0) return;
 			saveOrder(listOrder);
@@ -68,122 +77,183 @@ function TaskList({
 		[listOrder]
 	);
 
-	// useEffect(
-	// 	function () {
-	// 		function sortByDate() {
-	// 			let workingListOrder = [...order];
-	// 			workingListOrder.sort(function (a, b) {
-	// 				let aDate = tasks[a]?.date?.toDate();
-	// 				let bDate = tasks[b]?.date?.toDate();
-	// 				if (!aDate) aDate = new Date(8640000000000000);
-	// 				if (!bDate) bDate = new Date(8640000000000000);
-	// 				return aDate - bDate;
-	// 			});
-	// 			setListOrder(workingListOrder);
-	// 		}
+	useEffect(
+		function () {
+			if (!taskList) return;
 
-	// 		function sortByLength() {
-	// 			let workingListOrder = [...order];
-	// 			workingListOrder.sort(function (a, b) {
-	// 				return (tasks[a]?.length - tasks[b]?.length) * -1; // show longer tasks first
-	// 			});
-	// 			setListOrder(workingListOrder);
-	// 		}
+			function sortByPlate() {
+				if (!taskList) return;
+				let workingListOrder = [...taskList.order];
+				workingListOrder.sort(function (a, b) {
+					let aPlate = taskList.tasks[a].plate;
+					let bPlate = taskList.tasks[b].plate;
+					if (!aPlate) aPlate = false;
+					if (!bPlate) bPlate = false;
+					return aPlate === bPlate ? 0 : aPlate ? -1 : 1;
+				});
+				setListOrder(workingListOrder);
+			}
 
-	// 		function sortByType() {
-	// 			let workingListOrder = [...order];
-	// 			workingListOrder.sort(function (a, b) {
-	// 				let aInd = typeOptions.indexOf(tasks[a].type);
-	// 				let bInd = typeOptions.indexOf(tasks[b].type);
-	// 				return aInd - bInd;
-	// 			});
-	// 			setListOrder(workingListOrder);
-	// 		}
+			function sortByDate() {
+				if (!taskList) return;
 
-	// 		function sortByAlphabetical(property) {
-	// 			let workingListOrder = [...order];
-	// 			workingListOrder.sort(function (a, b) {
-	// 				let aProp = tasks[a][property];
-	// 				let bProp = tasks[b][property];
-	// 				if (!aProp) aProp = "π";
-	// 				if (!bProp) bProp = "π";
-	// 				return "".localeCompare.call(aProp, bProp);
-	// 			});
-	// 			setListOrder(workingListOrder);
-	// 		}
-	// 		switch (sortBy) {
-	// 			case "none":
-	// 				return;
-	// 			case "date":
-	// 				sortByDate();
-	// 				break;
-	// 			case "length":
-	// 				sortByLength();
-	// 				break;
-	// 			case "type":
-	// 				sortByType();
-	// 				break;
-	// 			default:
-	// 				sortByAlphabetical(sortBy);
-	// 				break;
-	// 		}
-	// 	},
-	// 	[sortBy, order, tasks]
-	// );
+				let workingListOrder = [...taskList.order];
+				workingListOrder.sort(function (a, b) {
+					let aDate = taskList.tasks[a]?.date?.toDate();
+					let bDate = taskList.tasks[b]?.date?.toDate();
+					if (!aDate) aDate = new Date(8640000000000000);
+					if (!bDate) bDate = new Date(8640000000000000);
+					return aDate.getTime() - bDate.getTime();
+				});
+				setListOrder(workingListOrder);
+			}
 
-	if (!taskList) return null;
+			function sortByLength() {
+				if (!taskList) return;
+				let workingListOrder = [...taskList.order];
+				workingListOrder.sort(function (a, b) {
+					return (taskList.tasks[a]?.length - taskList.tasks[b]?.length) * -1; // show longer tasks first
+				});
+				setListOrder(workingListOrder);
+			}
+
+			function sortByType() {
+				if (!taskList) return;
+				let workingListOrder = [...taskList.order];
+				workingListOrder.sort(function (a, b) {
+					let aInd = TYPE_OPTIONS.indexOf(taskList.tasks[a].type);
+					let bInd = TYPE_OPTIONS.indexOf(taskList.tasks[b].type);
+					return aInd - bInd;
+				});
+				setListOrder(workingListOrder);
+			}
+
+			function sortByAlphabetical() {
+				if (!taskList) return;
+				let workingListOrder = [...taskList.order];
+				workingListOrder.sort(function (a, b) {
+					let aProp = taskList.tasks[a].tag;
+					let bProp = taskList.tasks[b].tag;
+					if (!aProp) aProp = "π";
+					if (!bProp) bProp = "π";
+					return "".localeCompare.call(aProp, bProp);
+				});
+				setListOrder(workingListOrder);
+			}
+			switch (sortBy) {
+				case TaskField.none:
+					return;
+				case TaskField.plate:
+					sortByPlate();
+					break;
+				case TaskField.date:
+					sortByDate();
+					break;
+				case TaskField.length:
+					sortByLength();
+					break;
+				case TaskField.type:
+					sortByType();
+					break;
+				default:
+					sortByAlphabetical();
+					break;
+			}
+		},
+		[sortBy, taskList]
+	);
+
+	if (loading) {
+		if (showLoading)
+			return (
+				<div className="Loading">
+					<Oval
+						height={50}
+						width={50}
+						color="var(--black)"
+						wrapperStyle={{}}
+						wrapperClass=""
+						visible={true}
+						ariaLabel="oval-loading"
+						secondaryColor="var(--gray)"
+						strokeWidth={0}
+						strokeWidthSecondary={2}
+					/>
+				</div>
+			);
+
+		return null;
+	}
+
+	function calculateHeight() {
+		if (!taskList) return 0;
+		if (!listOrder) return 0;
+		if (listOrder.length === 0) return 0;
+
+		if (isMain) {
+			return "auto";
+		}
+
+		if (open) {
+			return "auto";
+		} else {
+			return 0;
+		}
+	}
 
 	return (
-		<div className={classNames("TaskList", isMain && "TaskListMain")}>
-			{listOrder.length === 0 && isMain && (
-				<div className="TaskListEmpty">
-					<NoTasksSvg />
-				</div>
-			)}
+		<AnimateHeight duration={500} height={calculateHeight()}>
+			<div className={classNames("TaskList", isMain && "TaskListMain")}>
+				{listOrder?.length === 0 && isMain && (
+					<div className="TaskListEmpty">
+						<NoTasksSvg />
+					</div>
+				)}
 
-			<DndContext
-				sensors={sensors}
-				collisionDetection={closestCenter}
-				onDragStart={handleDragStart}
-				onDragEnd={handleDragEnd}
-				onDragCancel={handleDragCancel}
-			>
-				<SortableContext
-					items={listOrder}
-					strategy={verticalListSortingStrategy}
+				<DndContext
+					sensors={sensors}
+					collisionDetection={closestCenter}
+					onDragStart={handleDragStart}
+					onDragEnd={handleDragEnd}
+					onDragCancel={handleDragCancel}
 				>
-					{listOrder?.map(function (taskId) {
-						return (
-							<SortableListTask
-								taskListId={taskListID}
-								taskId={taskId}
-								key={taskId}
-								id={taskId}
-								dragging={activeId === taskId}
+					<SortableContext
+						items={listOrder || []}
+						strategy={verticalListSortingStrategy}
+					>
+						{listOrder?.map(function (taskId) {
+							return (
+								<SortableTaskComponent
+									taskListID={taskListID}
+									taskID={taskId}
+									key={taskId}
+									id={taskId}
+									dragging={activeId === taskId}
+									sortBy={sortBy}
+								/>
+							);
+						})}
+					</SortableContext>
+					<DragOverlay>
+						{activeId ? (
+							<TaskComponent
+								taskListID={taskListID}
+								id={activeId}
+								dragging={true}
+								taskID={activeId}
 								sortBy={sortBy}
 							/>
-						);
-					})}
-				</SortableContext>
-				<DragOverlay>
-					{activeId ? (
-						<ListTask
-							taskListId={taskListId}
-							id={activeId}
-							task={tasks[activeId]}
-							taskId={activeId}
-							sortBy={sortBy}
-						/>
-					) : null}
-				</DragOverlay>
-			</DndContext>
-		</div>
+						) : null}
+					</DragOverlay>
+				</DndContext>
+			</div>
+		</AnimateHeight>
 	);
 
 	function handleDragStart(event: DragStartEvent) {
 		const { active } = event;
 		if (!active) return;
-		setActiveId(active.id);
+		setActiveId(active.id as string);
 	}
 
 	function handleDragEnd(event: DragEndEvent) {
@@ -192,8 +262,10 @@ function TaskList({
 
 		if (active.id !== over.id) {
 			setListOrder((listOrder) => {
-				const oldIndex = listOrder.indexOf(active.id);
-				const newIndex = listOrder.indexOf(over.id);
+				if (!listOrder) return;
+
+				const oldIndex = listOrder.indexOf(active.id as string);
+				const newIndex = listOrder.indexOf(over.id as string);
 
 				return arrayMove(listOrder, oldIndex, newIndex);
 			});
@@ -202,7 +274,7 @@ function TaskList({
 		setActiveId(null);
 	}
 
-	function handleDragCancel(event: DragCancelEvent) {
+	function handleDragCancel() {
 		setActiveId(null); // todo open issue on github
 	}
 }

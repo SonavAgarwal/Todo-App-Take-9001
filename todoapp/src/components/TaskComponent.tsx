@@ -1,18 +1,12 @@
-import { debounce } from "debounce";
-import React, {
+import {
 	ForwardedRef,
 	forwardRef,
-	useCallback,
 	useContext,
 	useEffect,
+	useId,
 	useState,
 } from "react";
-import { deleteTask, updateTask } from "../firebase.ts";
-import {
-	lengthCountedTags,
-	parseNewTextToUpdateObject,
-	preferredTagOrder,
-} from "../misc/options";
+import AnimateHeight from "react-animate-height";
 import {
 	BiCheckSquare,
 	BiDownArrow,
@@ -20,32 +14,33 @@ import {
 	BiSquare,
 	BiUpArrow,
 } from "react-icons/bi";
-import { NewTaskContext } from "../pages/Home";
 import { useSwipeable } from "react-swipeable";
-import AnimateHeight from "react-animate-height";
-import SubTaskList from "./SubTaskList";
-import ListTaskTag from "./ListTaskTag";
-import { SortMethod, Task } from "../misc/types.ts";
-import { useTask } from "../misc/useTask.ts";
 import { useDebouncedCallback } from "use-debounce";
+import { deleteTask, updateTask } from "../firebase.ts";
+import { LENGTH_COUNTED_TAGS, TAG_TYPES } from "../misc/options.ts";
+import { Task, TaskField } from "../misc/types.ts";
+import { useTask } from "../misc/useTask.ts";
+import { NewTaskInputFocusContext } from "../pages/Home.tsx";
+import SubTaskList from "./SubTaskList.tsx";
+import TaskTag from "./TaskTag.tsx";
 
 interface Props {
 	id: string;
-	taskId: string;
-	taskListId: string;
+	taskID: string;
+	taskListID: string;
 	dragging: boolean;
-	sortBy: SortMethod;
+	sortBy: TaskField;
 
-	dragHandleAttributes: any;
-	dragHandleListeners: any;
-	style: any;
+	dragHandleAttributes?: any;
+	dragHandleListeners?: any;
+	style?: any;
 }
 
-const ListTask = forwardRef(
+const TaskComponent = forwardRef(
 	(
 		{
-			taskListId,
-			taskId,
+			taskListID,
+			taskID,
 			dragHandleAttributes,
 			dragHandleListeners,
 			style,
@@ -54,58 +49,51 @@ const ListTask = forwardRef(
 		}: Props,
 		ref: ForwardedRef<HTMLDivElement>
 	) => {
-		const focusNewTaskRef = useContext(NewTaskContext);
+		const focusNewTaskInputRef = useContext(NewTaskInputFocusContext);
 		const editSwipeHandlers = useSwipeable({
 			onSwipedRight: function () {
 				setDeleted(true);
 				setTimeout(() => {
-					deleteTask(taskListId, taskId);
+					deleteTask(taskListID, taskID);
 				}, 500);
 			},
 			trackMouse: true,
 		});
 
-		const { task } = useTask(taskListId, taskId);
+		const { task } = useTask(taskListID, taskID);
 		const [deleted, setDeleted] = useState(false);
 
 		const [taskText, setTaskText] = useState("");
 		const [plate, setPlate] = useState(false);
-		const [open, setOpen] = useState(true);
+		const [open, setOpen] = useState(false);
 
 		useEffect(
 			function () {
 				if (!task) return;
 				setTaskText(task.text);
 				setPlate(task.plate);
-				setOpen(task.open || true);
+				if (typeof task.open === "boolean") setOpen(task.open);
+				else setOpen(true);
 			},
 			[task]
 		);
 
 		const handleTextEdit = useDebouncedCallback((changedText: string) => {
+			if (deleted) return;
 			if (changedText === task?.text) return;
-			if (!changedText) return;
-
-			// let updateObject = parseNewTextToUpdateObject(changedText);
-			// // prevent deep nested tasks
-			// if (taskListId !== "tasks" && task.type && updateObject.type === "list") {
-			// 	updateObject.wasList = false; // todo wastes storage space
-			// }
-
-			// updateTask(taskListId, taskId, updateObject);
+			updateTask(taskListID, taskID, { text: changedText });
 		}, 1000);
 
 		const handlePlateEdit = useDebouncedCallback((newPlate: boolean) => {
 			if (deleted) return;
 			if (task?.plate === newPlate) return;
-			updateTask(taskListId, taskId, { plate: newPlate });
+			updateTask(taskListID, taskID, { plate: newPlate });
 		}, 500);
 
 		const handleOpenEdit = useDebouncedCallback((newOpen: boolean) => {
 			if (deleted) return;
 			if (task?.open === newOpen) return;
-			console.log("meow");
-			updateTask(taskListId, taskId, { open: newOpen });
+			updateTask(taskListID, taskID, { open: newOpen });
 		}, 500);
 
 		useEffect(
@@ -127,50 +115,6 @@ const ListTask = forwardRef(
 			[open]
 		);
 
-		function TagsOrdered() {
-			let renderedTags: React.FC[] = [];
-			let key = 1;
-			if (!task) return renderedTags;
-			if (sortBy !== SortMethod.text) {
-				if (
-					task[sortBy.toString() as keyof Task] ||
-					(sortBy === "length" && task[sortBy] === 0)
-				) {
-					renderedTags.push(
-						<ListTaskTag
-							taskListId={taskListId}
-							key={key}
-							task={task}
-							taskId={taskId}
-							property={sortBy}
-							dragging={props.dragging}
-						/>
-					);
-					key++;
-				}
-			}
-			for (let taskProperty of preferredTagOrder) {
-				if (
-					taskProperty !== sortBy &&
-					(task[taskProperty] ||
-						(taskProperty === "length" && task[taskProperty] === 0))
-				) {
-					renderedTags.push(
-						<ListTaskTag
-							taskListId={taskListId}
-							key={key}
-							task={task}
-							taskId={taskId}
-							property={taskProperty}
-							dragging={props.dragging}
-						/>
-					);
-					key++;
-				}
-			}
-			return renderedTags;
-		}
-
 		return (
 			<div style={style} ref={ref}>
 				<AnimateHeight duration={500} height={deleted ? 0 : "auto"}>
@@ -178,7 +122,7 @@ const ListTask = forwardRef(
 						className="ListTaskContainer"
 						style={{
 							opacity:
-								task?.length === 0 && lengthCountedTags.includes(task?.type)
+								task?.length === 0 && LENGTH_COUNTED_TAGS.includes(task?.type)
 									? 0.5
 									: 1,
 						}}
@@ -194,11 +138,12 @@ const ListTask = forwardRef(
 									}}
 									onKeyUp={function (event) {
 										if (event.key === "Enter") {
-											focusNewTaskRef();
+											focusNewTaskInputRef();
 										}
 									}}
 								></input>
 							</div>
+
 							{task?.type === "list" && (
 								<button
 									onClick={function () {
@@ -210,6 +155,7 @@ const ListTask = forwardRef(
 									{open ? <BiDownArrow /> : <BiUpArrow />}
 								</button>
 							)}
+
 							<button
 								onClick={function () {
 									setPlate(!plate);
@@ -220,6 +166,7 @@ const ListTask = forwardRef(
 							>
 								{plate ? <BiCheckSquare /> : <BiSquare />}
 							</button>
+
 							<div
 								className="ListTaskButton"
 								{...dragHandleAttributes}
@@ -230,10 +177,15 @@ const ListTask = forwardRef(
 							</div>
 						</div>
 						<div className="ListTaskTagsContainer">
-							<TagsOrdered />
+							<OrderedTags
+								taskListID={taskListID}
+								taskID={taskID}
+								sortBy={sortBy}
+								dragging={props.dragging}
+							/>
 						</div>
 						{task?.type === "list" && (
-							<SubTaskList subTaskListId={taskId} open={open}></SubTaskList>
+							<SubTaskList taskListID={taskID} open={open}></SubTaskList>
 						)}
 					</div>
 				</AnimateHeight>
@@ -242,4 +194,57 @@ const ListTask = forwardRef(
 	}
 );
 
-export default ListTask;
+function OrderedTags({
+	taskListID,
+	taskID,
+	sortBy,
+	dragging,
+}: {
+	taskListID: string;
+	taskID: string;
+	sortBy: TaskField;
+	dragging: boolean;
+}) {
+	const id = useId();
+	const { task } = useTask(taskListID, taskID);
+
+	let renderedTags: JSX.Element[] = [];
+
+	if (!task) return renderedTags;
+
+	if (sortBy !== TaskField.text) {
+		if (
+			task[sortBy as keyof Task] || // has tag
+			(sortBy === "length" && task[sortBy] === 0) // length is 0
+		) {
+			renderedTags.push(
+				<TaskTag
+					taskListID={taskListID}
+					taskID={taskID}
+					tagType={sortBy}
+					dragging={dragging}
+					key={id + sortBy}
+				/>
+			);
+		}
+	}
+
+	for (let tagType of TAG_TYPES) {
+		if (task[tagType as keyof Task] === undefined) continue;
+		if (tagType === sortBy) continue;
+
+		renderedTags.push(
+			<TaskTag
+				taskListID={taskListID}
+				taskID={taskID}
+				tagType={tagType}
+				dragging={dragging}
+				key={id + tagType}
+			/>
+		);
+	}
+
+	return renderedTags;
+}
+
+export default TaskComponent;

@@ -94,7 +94,6 @@ const ListTask = forwardRef(
 		function handleOpenEdit(newOpen) {
 			if (deleted) return;
 			if (task?.open === newOpen) return;
-			console.log("meow");
 			updateTask(taskListId, taskId, { open: newOpen });
 		}
 

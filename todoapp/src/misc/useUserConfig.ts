@@ -1,13 +1,15 @@
-import { configCache, taskListCache } from "./cache";
+import { dataCache } from "./cache";
 import { UserConfigType } from "./types";
 import { useListener } from "./useListener";
 
 export function useUserConfig(): {
 	userConfig: UserConfigType;
+	loading: boolean;
+	error: any;
 } {
-	useListener("config");
+	const { loading, error } = useListener("config");
 
-	const userConfig = configCache.get("config");
+	const userConfig = dataCache.get("config");
 
-	return { userConfig };
+	return { userConfig, loading, error };
 }

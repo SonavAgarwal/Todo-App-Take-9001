@@ -118,7 +118,7 @@ export function updateTaskOrder(taskList, newOrder) {
 	updateDoc(taskDocRef, updateObject);
 }
 
-export function updateConfigColors(word, color) {
+export function updateConfigColors(word: string, color: string) {
 	console.log("Saving colors");
 	let updateObject = {
 		[word]: color,

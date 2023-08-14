@@ -1,57 +1,45 @@
 import { signOut } from "firebase/auth";
-import { doc, increment } from "firebase/firestore";
-import { createContext, useEffect, useRef, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useDocumentData } from "react-firebase-hooks/firestore";
+import { createContext, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
 	BiCalendarAlt,
 	BiCategoryAlt,
 	BiCheckSquare,
-	BiFontFamily,
 	BiLogOut,
 	BiMenu,
-	BiPlay,
 	BiPlus,
 	BiPointer,
 	BiTime,
 } from "react-icons/bi";
-import { Oval } from "react-loader-spinner";
+import PlayButton from "../components/PlayButton.tsx";
 import TaskList from "../components/TaskList";
-import { auth, createTask, firestore, updateTask } from "../firebase.ts";
-import { lengthCountedTags, lengthStep } from "../misc/options";
-import { useMediaQuery } from "../misc/useMediaQuery";
-import { useTaskList } from "../misc/useTaskList.ts";
-import { SortMethod } from "../misc/types.ts";
+import {
+	auth,
+	createTask,
+	reorganizeConfig,
+	reorganizeTaskLists,
+} from "../firebase.ts";
+import { MAIN_TASK_LIST_NAME } from "../misc/options.ts";
+import { TaskField } from "../misc/types.ts";
+import { useUserConfig } from "../misc/useUserConfig.ts";
 
-export const NewTaskContext = createContext(function () {});
+export const NewTaskInputFocusContext = createContext(function () {});
 export const UserConfigContext = createContext({});
 
 const sortIcons = [
-	{ sortBy: SortMethod.none, icon: <BiPointer /> },
-	{ sortBy: SortMethod.plate, icon: <BiCheckSquare /> },
-	{ sortBy: SortMethod.tag, icon: <BiCategoryAlt /> },
-	{ sortBy: SortMethod.type, icon: <BiMenu /> },
-	{ sortBy: SortMethod.length, icon: <BiTime /> },
-	{ sortBy: SortMethod.date, icon: <BiCalendarAlt /> },
-	{ sortBy: SortMethod.text, icon: <BiFontFamily /> },
+	{ sortBy: TaskField.none, icon: <BiPointer /> },
+	{ sortBy: TaskField.plate, icon: <BiCheckSquare /> },
+	{ sortBy: TaskField.date, icon: <BiCalendarAlt /> },
+	{ sortBy: TaskField.length, icon: <BiTime /> },
+	{ sortBy: TaskField.tag, icon: <BiCategoryAlt /> },
+	{ sortBy: TaskField.type, icon: <BiMenu /> },
+	// { sortBy: TaskField.text, icon: <BiFontFamily /> },
 ];
 
 function Home() {
-	// const isMobile = useMediaQuery("(max-aspect-ratio: 1/1)");
+	const { userConfig } = useUserConfig();
 
-	const [user, userLoading] = useAuthState(auth);
-	// const [tasks, tasksLoading] = useDocumentData(
-	// 	doc(firestore, `users/${user?.uid}/data/tasks`)
-	// );
-
-	const { taskList } = useTaskList("tasks");
-
-	const [userConfig] = useDocumentData(
-		doc(firestore, `users/${user?.uid}/data/config`)
-	);
-
-	const [sortBy, setSortBy] = useState("none");
+	const [sortBy, setSortBy] = useState<TaskField>(TaskField.none);
 
 	const newTaskRef = useRef<HTMLDivElement | null>(null);
 
@@ -61,16 +49,22 @@ function Home() {
 
 	const { register, handleSubmit, reset, setFocus } = useForm();
 	function onSubmit(data: any) {
-		createTask("tasks", data.text);
+		createTask(MAIN_TASK_LIST_NAME, data.text);
 		reset();
 		setTimeout(() => {
 			newTaskRef.current?.scrollIntoView();
 		}, 500);
 	}
 
+	if (userConfig && !userConfig.versionNumber) {
+		reorganizeTaskLists();
+		reorganizeConfig();
+		return <div>Reorganizing...</div>;
+	}
+
 	return (
 		<UserConfigContext.Provider value={userConfig || {}}>
-			<NewTaskContext.Provider value={focusNewTask}>
+			<NewTaskInputFocusContext.Provider value={focusNewTask}>
 				<div className="HomePage">
 					<div className="HomePageScrollContainer">
 						<div className="HomePageHeaderContainer">
@@ -84,62 +78,17 @@ function Home() {
 									<BiLogOut />
 								</button>
 								<div></div>
-								<button
-									onClick={function () {
-										// if (!platePlaying && plateLength < lengthStep) return;
-										// setPlatePlaying(!platePlaying);
-									}}
-									tabIndex={-1}
-								>
-									{
-										<BiPlay
-										// className={`PlayPlateIcon ${
-										// 	platePlaying ? "PlayPlateIconPlaying" : ""
-										// }`}
-										/>
-									}
-									<p
-									// className={`HeaderPlateLength ${
-									// 	platePlaying ? "PlatePlaying" : ""
-									// }`}
-									>
-										{/* {Math.floor(plateLength / 60)}
-										{plateColon ? ":" : " "}
-										{plateLength % 60 < 10 ? "0" : ""}
-										{plateLength % 60} */}
-									</p>
-								</button>
+								<PlayButton />
 								<div></div>
 								{<SortByButton sortBy={sortBy} setSortBy={setSortBy} />}
 							</div>
 						</div>
 
-						{!taskList && (
-							<div className="Loading">
-								<Oval
-									height={50}
-									width={50}
-									color="var(--black)"
-									wrapperStyle={{}}
-									wrapperClass=""
-									visible={true}
-									ariaLabel="oval-loading"
-									secondaryColor="var(--gray)"
-									strokeWidth={0}
-									strokeWidthSecondary={2}
-								/>
-							</div>
-						)}
-
-						{taskList && (
-							<TaskList
-								main={true}
-								taskListId={"tasks"}
-								tasks={tasks}
-								order={listOrder}
-								sortBy={sortBy}
-							></TaskList>
-						)}
+						<TaskList
+							showLoading={true}
+							taskListID={MAIN_TASK_LIST_NAME}
+							sortBy={sortBy}
+						></TaskList>
 
 						<div className="CreateTaskContainer" ref={newTaskRef}>
 							<form className="CreateTask" onSubmit={handleSubmit(onSubmit)}>
@@ -165,12 +114,18 @@ function Home() {
 						</div>
 					</div>
 				</div>
-			</NewTaskContext.Provider>
+			</NewTaskInputFocusContext.Provider>
 		</UserConfigContext.Provider>
 	);
 }
 
-function SortByButton({ sortBy, setSortBy }) {
+function SortByButton({
+	sortBy,
+	setSortBy,
+}: {
+	sortBy: TaskField;
+	setSortBy: any;
+}) {
 	let currentSortBy = sortIcons.find(function (item) {
 		return item.sortBy === sortBy;
 	});
@@ -183,6 +138,10 @@ function SortByButton({ sortBy, setSortBy }) {
 		sortIcons.length;
 
 	let nextSortBy = sortIcons[nextIndex].sortBy;
+
+	if (!currentSortBy) {
+		return <div></div>;
+	}
 
 	return (
 		<button

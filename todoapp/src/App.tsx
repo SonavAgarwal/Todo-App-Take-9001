@@ -18,7 +18,7 @@ function AppWrapper() {
 }
 
 function App() {
-	const [user, loading, error] = useAuthState(auth); // loading, error
+	const [user, loading] = useAuthState(auth); // loading, error
 
 	const navigate = useNavigate();
 

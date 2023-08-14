@@ -1,44 +1,38 @@
-import React, {
-	useState,
-	useRef,
-	useCallback,
-	useEffect,
-	MouseEvent,
-} from "react";
-import { lengthStep } from "../misc/options";
-import { debounce } from "debounce";
+import { MouseEvent, useEffect, useRef, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
+import { updateTask } from "../../firebase";
+import { LENGTH_STEP } from "../../misc/options";
+import { useTask } from "../../misc/useTask";
 
 interface Props {
-	onClick: () => any;
-	onTouchEndCapture: () => any;
-	time: number;
-	saveTime: (newTime: number) => void;
+	taskListID: string;
+	taskID: string;
 }
 
-const TimeTag = ({ onClick, onTouchEndCapture, time, saveTime }: Props) => {
-	const [number, setNumber] = useState(time);
-	const [startingNumber, setStartingNumber] = useState(time);
+const TimeTag = ({ taskListID, taskID }: Props) => {
+	const { task } = useTask(taskListID, taskID);
+
 	const dragStartXRef = useRef(0);
 	const mouseDelta = useRef(0);
 	const [dragging, setDragging] = useState(false);
 
-	useEffect(() => {
-		setNumber(time);
-		setStartingNumber(time);
-	}, [time]);
-
-	const saveTimeDebounced = useCallback(
-		debounce(function () {
-			saveTime(number);
-		}, 100),
-		[number]
-	);
+	const [length, setLength] = useState<number>(0);
 
 	useEffect(() => {
-		if (!dragging && number !== time) {
-			saveTimeDebounced();
-		}
-	}, [dragging, saveTimeDebounced, startingNumber]);
+		if (!task) return;
+		setLength(task.length);
+	}, [task]);
+
+	const saveLengthDebounced = useDebouncedCallback(function (
+		newLength: number
+	) {
+		updateTask(taskListID, taskID, { length: newLength });
+	},
+	100);
+
+	useEffect(() => {
+		if (!dragging) saveLengthDebounced(length);
+	}, [dragging, saveLengthDebounced, length]);
 
 	const handleMouseDown = (event: MouseEvent<HTMLDivElement>): void => {
 		dragStartXRef.current = event.clientX;
@@ -60,13 +54,13 @@ const TimeTag = ({ onClick, onTouchEndCapture, time, saveTime }: Props) => {
 		let increment = 0;
 
 		if (mouseDelta.current > 0)
-			increment = Math.floor(mouseDelta.current / 20) * lengthStep;
+			increment = Math.floor(mouseDelta.current / 20) * LENGTH_STEP;
 		else if (mouseDelta.current < 0)
-			increment = Math.ceil(mouseDelta.current / 20) * lengthStep;
+			increment = Math.ceil(mouseDelta.current / 20) * LENGTH_STEP;
 
 		mouseDelta.current = mouseDelta.current % 20;
 
-		setNumber((prevNumber) => {
+		setLength((prevNumber) => {
 			if (prevNumber + increment < 0) return 0;
 			else if (prevNumber + increment > 120) return 120;
 			return prevNumber + increment;
@@ -79,7 +73,7 @@ const TimeTag = ({ onClick, onTouchEndCapture, time, saveTime }: Props) => {
 		document.removeEventListener("pointerlockchange", handlePointerLockChange);
 		document.exitPointerLock();
 
-		setStartingNumber(number);
+		// setLength(length);
 		setDragging(false);
 	};
 
@@ -91,13 +85,8 @@ const TimeTag = ({ onClick, onTouchEndCapture, time, saveTime }: Props) => {
 	};
 
 	return (
-		<div
-			className="ListTaskTag TimeTag"
-			onClick={onClick}
-			onTouchEndCapture={onTouchEndCapture}
-			onMouseDown={handleMouseDown}
-		>
-			{number}
+		<div className="ListTaskTag TimeTag" onMouseDown={handleMouseDown}>
+			{length}
 		</div>
 	);
 };

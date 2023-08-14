@@ -1,13 +1,15 @@
-import { taskListCache } from "./cache";
+import { dataCache } from "./cache";
 import { TaskList } from "./types";
 import { useListener } from "./useListener";
 
 export function useTaskList(taskListID: string): {
 	taskList: TaskList | undefined;
+	loading: boolean;
+	error: any;
 } {
-	useListener(taskListID);
+	const { loading, error } = useListener(taskListID);
 
-	const taskList = taskListCache.get(taskListID);
+	const taskList = dataCache.get(taskListID);
 
-	return { taskList };
+	return { taskList, loading, error };
 }

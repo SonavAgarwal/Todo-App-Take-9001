@@ -1,57 +1,62 @@
-import { doc } from "firebase/firestore";
-import React, { useEffect, useRef, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { useDocumentData } from "react-firebase-hooks/firestore";
-import { BiPlus } from "react-icons/bi";
-import { auth, createTask, firestore } from "../firebase";
+import { useContext, useRef } from "react";
 import { useForm } from "react-hook-form";
-import TaskList from "./TaskList";
+import { BiPlus } from "react-icons/bi";
+import TaskList from "../components/TaskList";
+import { createTask } from "../firebase.ts";
+import { TaskField } from "../misc/types.ts";
+import { NewTaskInputFocusContext } from "../pages/Home.tsx";
 import AnimateHeight from "react-animate-height";
+import classNames from "classnames";
 
-function SubTaskList({ subTaskListId, open }) {
-	const [user] = useAuthState(auth); // todo pass down uid in case it makes a difference in performance / failed reads etc
-	const [tasks] = useDocumentData(
-		doc(firestore, `users/${user?.uid}/data/${subTaskListId}`)
-	);
-
-	const [listOrder, setListOrder] = useState(tasks?.order);
-	useEffect(
-		function () {
-			setListOrder(tasks?.order);
-		},
-		[tasks]
-	);
-
-	const newTaskRef = useRef();
+function SubTaskList({
+	taskListID,
+	open,
+}: {
+	taskListID: string;
+	open: boolean;
+}) {
 	const { register, handleSubmit, reset } = useForm();
 
-	function onSubmit(data) {
-		createTask(subTaskListId, data.text);
+	const newTaskRef = useRef<HTMLDivElement | null>(null);
+	const focusNewTaskInputRef = useContext(NewTaskInputFocusContext);
+
+	function onSubmit(data: any) {
+		if (!data.text) {
+			focusNewTaskInputRef();
+			return;
+		}
+
+		createTask(taskListID, data.text);
 		reset();
 		setTimeout(() => {
-			// newTaskRef.current.scrollIntoView();
+			newTaskRef.current?.scrollIntoView();
 		}, 500);
 	}
 
 	return (
-		<AnimateHeight duration={500} height={open ? "auto" : 0}>
-			<div className="SubTaskListContainer">
-				<TaskList
-					taskListId={subTaskListId}
-					tasks={tasks}
-					order={listOrder}
-					sortBy={"none"}
-				></TaskList>
+		<div
+			className={classNames(
+				"SubTaskListContainer",
+				!open && "SubTaskListContainer-NoTopMargin"
+			)}
+		>
+			<TaskList
+				taskListID={taskListID}
+				sortBy={TaskField.none}
+				showLoading={false}
+				open={open}
+			></TaskList>
+
+			<AnimateHeight duration={500} height={open ? "auto" : 0}>
 				<div className="CreateTaskContainer" ref={newTaskRef}>
 					<form className="CreateTask" onSubmit={handleSubmit(onSubmit)}>
 						<div className="CreateTaskInputContainer">
 							<input
 								className="CreateTaskInput"
-								size={1}
-								placeholder="new subtask..."
+								placeholder="new task..."
 								autoComplete="off"
 								onFocus={function (event) {
-									// event.target.scrollIntoView();
+									event.target.scrollIntoView();
 								}}
 								{...register("text")}
 							/>
@@ -61,8 +66,8 @@ function SubTaskList({ subTaskListId, open }) {
 						</button>
 					</form>
 				</div>
-			</div>
-		</AnimateHeight>
+			</AnimateHeight>
+		</div>
 	);
 }
 

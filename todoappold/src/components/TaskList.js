@@ -130,9 +130,11 @@ function TaskList({ main, taskListId, tasks, order, sortBy }) {
 
 	if (!isIterable(listOrder)) return null;
 
+	const showEmptyImage = !!!listOrder.length;
+
 	return (
 		<div className={"TaskList" + (main ? " TaskListMain" : "")}>
-			{listOrder.length === 0 && main && (
+			{showEmptyImage && main && (
 				<div className="TaskListEmpty">
 					<NoTasksSvg />
 				</div>

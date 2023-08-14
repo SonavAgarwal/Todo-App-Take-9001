@@ -1,9 +1,8 @@
-import React from "react";
 import { useSignInWithGoogle } from "react-firebase-hooks/auth";
 import { auth } from "../firebase.ts";
-import { versionNumber } from "../misc/options";
+import { VERSION_NUMBER } from "../misc/options.ts";
 
-function Auth(props) {
+function Auth() {
 	const [signInWithGoogle] = useSignInWithGoogle(auth);
 
 	return (
@@ -18,7 +17,7 @@ function Auth(props) {
 					Sign in with Google
 				</button>
 			</div>
-			<p>v {versionNumber}</p>
+			<p>v {VERSION_NUMBER}</p>
 		</div>
 	);
 }

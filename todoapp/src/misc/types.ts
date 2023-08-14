@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase/firestore";
+import { FieldValue, Timestamp } from "firebase/firestore";
 
 export interface Task {
 	done: boolean;
@@ -7,9 +7,30 @@ export interface Task {
 	plate: boolean;
 	text: string;
 	tag?: string;
-	type: string;
+	type: TaskType;
 	wasList?: boolean;
 	date?: Timestamp;
+	link?: string;
+}
+
+export enum TaskType {
+	long = "long",
+	short = "short",
+	email = "email",
+	thought = "thought",
+	list = "list",
+}
+
+export interface TaskUpdateObject {
+	done?: boolean;
+	length?: number | FieldValue;
+	open?: boolean;
+	plate?: boolean;
+	text?: string;
+	tag?: string;
+	type?: string;
+	wasList?: boolean;
+	date?: Timestamp | FieldValue;
 	link?: string;
 }
 
@@ -20,7 +41,7 @@ export interface TaskList {
 	};
 }
 
-export enum SortMethod {
+export enum TaskField {
 	none = "none",
 	plate = "plate",
 	tag = "tag",
@@ -28,8 +49,12 @@ export enum SortMethod {
 	length = "length",
 	date = "date",
 	text = "text",
+	link = "link",
 }
 
 export interface UserConfigType {
-	[key: string]: any;
+	versionNumber: string;
+	colors: {
+		[key: string]: any;
+	};
 }
