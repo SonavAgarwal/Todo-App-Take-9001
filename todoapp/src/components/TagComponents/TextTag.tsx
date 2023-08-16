@@ -53,6 +53,7 @@ const TextTag = ({ taskListID, taskID, dragging }: Props) => {
 	}, [dragging]);
 
 	if (!task) return null;
+	if (!task.tag) return null;
 
 	return (
 		<>
