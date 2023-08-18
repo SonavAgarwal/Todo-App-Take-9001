@@ -26,7 +26,7 @@ function SubTaskList({
 			return;
 		}
 
-		createTask(taskListID, data.text);
+		createTask(taskListID, data.text, true);
 		reset();
 		setTimeout(() => {
 			newTaskRef.current?.scrollIntoView();

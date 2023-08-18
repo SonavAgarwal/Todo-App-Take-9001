@@ -48,13 +48,19 @@ onAuthStateChanged(auth, function (u) {
 	}
 });
 
-export function createTask(taskList: string, text: string) {
+export function createTask(
+	taskList: string,
+	text: string,
+	isSubtask?: boolean
+) {
 	if (!user) return;
 	if (!text) return;
 
 	let taskUuid = shortUUID.generate();
 	let taskUpdateObject: Task = { ...DEFAULT_TASK };
-	if (taskList !== MAIN_TASK_LIST_NAME) taskUpdateObject.type = TaskType.short;
+
+	if (isSubtask) taskUpdateObject.type = TaskType.short;
+
 	Object.assign(taskUpdateObject, parseNewTextToUpdateObject(text));
 
 	const updateObject = {

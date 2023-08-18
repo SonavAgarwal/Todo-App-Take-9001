@@ -32,7 +32,7 @@ export function useListener(docId: string): {
 			function handleSnapshot(doc: any) {
 				if (doc.exists()) {
 					console.log("Document data:", doc.data(), "for docId", docId);
-					dataCache.set(docId, doc.data() as TaskList);
+					dataCache.set(docId, doc.data());
 					// broadcast to all listeners
 					const listener = listenerCache.get(docId);
 					if (!listener) return; // should never happen

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { BiPlay } from "react-icons/bi";
-import { updateTask } from "../firebase.ts";
+import { updateTask } from "../../firebase.ts";
 import {
 	LENGTH_STEP,
 	MAIN_TASK_LIST_NAME,
 	typeTimeMatters,
-} from "../misc/options.ts";
-import { useTaskList } from "../misc/useTaskList.ts";
+} from "../../misc/options.ts";
+import { useTaskList } from "../../misc/useTaskList.ts";
 import { increment } from "firebase/firestore";
 
 const PlayButton = () => {
@@ -52,7 +52,7 @@ const PlayButton = () => {
 	);
 
 	function findNextTaskId() {
-		let nextTaskId = taskList?.order.find(function (taskId) {
+		let nextTaskId = taskList?.order.find(function (taskId: string) {
 			let task = taskList.tasks[taskId];
 			return task.plate && task.length >= LENGTH_STEP;
 		});

@@ -50,18 +50,29 @@ const TaskComponent = forwardRef(
 		ref: ForwardedRef<HTMLDivElement>
 	) => {
 		const focusNewTaskInputRef = useContext(NewTaskInputFocusContext);
-		const editSwipeHandlers = useSwipeable({
+		const plateSwipeHandlers = useSwipeable({
 			onSwipedRight: function () {
-				setDeleted(true);
+				setIsClosing(true);
 				setTimeout(() => {
 					deleteTask(taskListID, taskID);
 				}, 500);
 			},
 			trackMouse: true,
+			trackTouch: true,
+		});
+		const listSwipeHandlers = useSwipeable({
+			onSwipedUp: function () {
+				setIsClosing(true);
+				setTimeout(() => {
+					updateTask(taskListID, taskID, { pinned: true });
+				}, 500);
+			},
+			trackMouse: true,
+			trackTouch: true,
 		});
 
 		const { task } = useTask(taskListID, taskID);
-		const [deleted, setDeleted] = useState(false);
+		const [isClosing, setIsClosing] = useState(false);
 
 		const [taskText, setTaskText] = useState("");
 		const [plate, setPlate] = useState(false);
@@ -79,19 +90,19 @@ const TaskComponent = forwardRef(
 		);
 
 		const handleTextEdit = useDebouncedCallback((changedText: string) => {
-			if (deleted) return;
+			if (isClosing) return;
 			if (changedText === task?.text) return;
 			updateTask(taskListID, taskID, { text: changedText });
 		}, 1000);
 
 		const handlePlateEdit = useDebouncedCallback((newPlate: boolean) => {
-			if (deleted) return;
+			if (isClosing) return;
 			if (task?.plate === newPlate) return;
 			updateTask(taskListID, taskID, { plate: newPlate });
 		}, 500);
 
 		const handleOpenEdit = useDebouncedCallback((newOpen: boolean) => {
-			if (deleted) return;
+			if (isClosing) return;
 			if (task?.open === newOpen) return;
 			updateTask(taskListID, taskID, { open: newOpen });
 		}, 500);
@@ -115,9 +126,11 @@ const TaskComponent = forwardRef(
 			[open]
 		);
 
+		if (task?.pinned) return null;
+
 		return (
 			<div style={style} ref={ref}>
-				<AnimateHeight duration={500} height={deleted ? 0 : "auto"}>
+				<AnimateHeight duration={500} height={isClosing ? 0 : "auto"}>
 					<div
 						className="ListTaskContainer"
 						style={{
@@ -151,6 +164,7 @@ const TaskComponent = forwardRef(
 									}}
 									className="ListTaskButton safariButton"
 									tabIndex={-1}
+									{...listSwipeHandlers}
 								>
 									{open ? <BiDownArrow /> : <BiUpArrow />}
 								</button>
@@ -161,7 +175,7 @@ const TaskComponent = forwardRef(
 									setPlate(!plate);
 								}}
 								className="ListTaskButton safariButton"
-								{...editSwipeHandlers}
+								{...plateSwipeHandlers}
 								tabIndex={-1}
 							>
 								{plate ? <BiCheckSquare /> : <BiSquare />}

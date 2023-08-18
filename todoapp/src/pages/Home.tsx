@@ -1,17 +1,10 @@
 import { signOut } from "firebase/auth";
 import { createContext, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-	BiCalendarAlt,
-	BiCategoryAlt,
-	BiCheckSquare,
-	BiLogOut,
-	BiMenu,
-	BiPlus,
-	BiPointer,
-	BiTime,
-} from "react-icons/bi";
-import PlayButton from "../components/PlayButton.tsx";
+import { BiLogOut, BiPlus } from "react-icons/bi";
+import PlayButton from "../components/HomeComponents/PlayButton.tsx";
+import { SortByButton } from "../components/HomeComponents/SortButton.tsx";
+import TaskListSelect from "../components/HomeComponents/TaskListSelect.tsx";
 import TaskList from "../components/TaskList";
 import {
 	auth,
@@ -21,25 +14,19 @@ import {
 } from "../firebase.ts";
 import { MAIN_TASK_LIST_NAME } from "../misc/options.ts";
 import { TaskField } from "../misc/types.ts";
+import { usePinnedLists } from "../misc/usePinnedLists.ts";
 import { useUserConfig } from "../misc/useUserConfig.ts";
 
 export const NewTaskInputFocusContext = createContext(function () {});
 export const UserConfigContext = createContext({});
 
-const sortIcons = [
-	{ sortBy: TaskField.none, icon: <BiPointer /> },
-	{ sortBy: TaskField.plate, icon: <BiCheckSquare /> },
-	{ sortBy: TaskField.date, icon: <BiCalendarAlt /> },
-	{ sortBy: TaskField.length, icon: <BiTime /> },
-	{ sortBy: TaskField.tag, icon: <BiCategoryAlt /> },
-	{ sortBy: TaskField.type, icon: <BiMenu /> },
-	// { sortBy: TaskField.text, icon: <BiFontFamily /> },
-];
-
 function Home() {
 	const { userConfig } = useUserConfig();
 
 	const [sortBy, setSortBy] = useState<TaskField>(TaskField.none);
+
+	const { pinnedLists } = usePinnedLists();
+	const [selectedList, setSelectedList] = useState<string>(MAIN_TASK_LIST_NAME);
 
 	const newTaskRef = useRef<HTMLDivElement | null>(null);
 
@@ -49,7 +36,7 @@ function Home() {
 
 	const { register, handleSubmit, reset, setFocus } = useForm();
 	function onSubmit(data: any) {
-		createTask(MAIN_TASK_LIST_NAME, data.text);
+		createTask(selectedList, data.text);
 		reset();
 		setTimeout(() => {
 			newTaskRef.current?.scrollIntoView();
@@ -84,10 +71,17 @@ function Home() {
 							</div>
 						</div>
 
+						<TaskListSelect
+							selectedTaskListID={selectedList}
+							setSelectedTaskListID={setSelectedList}
+							pinnedListIDs={pinnedLists}
+						/>
+
 						<TaskList
 							showLoading={true}
-							taskListID={MAIN_TASK_LIST_NAME}
+							taskListID={selectedList}
 							sortBy={sortBy}
+							isMain={true}
 						></TaskList>
 
 						<div className="CreateTaskContainer" ref={newTaskRef}>
@@ -116,42 +110,6 @@ function Home() {
 				</div>
 			</NewTaskInputFocusContext.Provider>
 		</UserConfigContext.Provider>
-	);
-}
-
-function SortByButton({
-	sortBy,
-	setSortBy,
-}: {
-	sortBy: TaskField;
-	setSortBy: any;
-}) {
-	let currentSortBy = sortIcons.find(function (item) {
-		return item.sortBy === sortBy;
-	});
-
-	let nextIndex =
-		(1 +
-			sortIcons.findIndex(function (icon) {
-				return sortBy === icon.sortBy;
-			})) %
-		sortIcons.length;
-
-	let nextSortBy = sortIcons[nextIndex].sortBy;
-
-	if (!currentSortBy) {
-		return <div></div>;
-	}
-
-	return (
-		<button
-			onClick={function () {
-				setSortBy(nextSortBy);
-			}}
-			tabIndex={-1}
-		>
-			{currentSortBy.icon}
-		</button>
 	);
 }
 

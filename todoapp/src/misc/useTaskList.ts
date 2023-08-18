@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { dataCache } from "./cache";
 import { TaskList } from "./types";
 import { useListener } from "./useListener";
@@ -6,10 +7,26 @@ export function useTaskList(taskListID: string): {
 	taskList: TaskList | undefined;
 	loading: boolean;
 	error: any;
+	loadedTaskListID: string;
 } {
 	const { loading, error } = useListener(taskListID);
+	const emptyTaskList: TaskList = useMemo(
+		() => ({
+			order: [],
+			tasks: {},
+		}),
+		[]
+	);
 
-	const taskList = dataCache.get(taskListID);
+	let taskList: TaskList = dataCache.get(taskListID);
+	if (!taskList) {
+		taskList = emptyTaskList;
+	}
 
-	return { taskList, loading, error };
+	if (!taskList.tasks) taskList.tasks = emptyTaskList.tasks;
+	if (!taskList.order) taskList.order = emptyTaskList.order;
+
+	console.log("useTaskList", taskListID, taskList);
+
+	return { taskList, loading, error, loadedTaskListID: taskListID };
 }

@@ -16,43 +16,48 @@ import {
 } from "@dnd-kit/sortable";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
 import { Oval } from "react-loader-spinner";
+import { useDebouncedCallback } from "use-debounce";
+import AnimateHeight from "react-animate-height";
 // @ts-ignore
 import NoTasksSvg from "../assets/NoTasks";
 import { updateTaskOrder } from "../firebase.ts";
-import { MAIN_TASK_LIST_NAME, TYPE_OPTIONS } from "../misc/options.ts";
+import { TYPE_OPTIONS } from "../misc/options.ts";
 import { TaskField } from "../misc/types.ts";
+import { usePinnedLists } from "../misc/usePinnedLists.ts";
 import { useTaskList } from "../misc/useTaskList.ts";
 import { SortableTaskComponent } from "./SortableTaskComponent.tsx";
 import TaskComponent from "./TaskComponent.tsx";
-import AnimateHeight from "react-animate-height";
 
 function TaskList({
 	taskListID,
 	sortBy,
 	showLoading = false,
 	open = true,
+	isMain = false,
 }: {
 	taskListID: string;
 	sortBy: TaskField;
 	showLoading?: boolean;
 	open?: boolean;
+	isMain?: boolean;
 }) {
-	const isMain = taskListID === MAIN_TASK_LIST_NAME;
-
 	const [activeId, setActiveId] = useState<string | null>(null);
 	const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
 	const { taskList, loading } = useTaskList(taskListID);
+	const { pinnedCount } = usePinnedLists();
 
 	const [listOrder, setListOrder] = useState<string[] | undefined>();
 	useEffect(
 		function () {
+			if (loading) return;
 			if (!taskList) return;
+			console.log("task list order changed");
+			console.log(taskList);
 			setListOrder(taskList.order);
 		},
-		[taskList?.order]
+		[taskList?.order, taskListID, loading]
 	);
 
 	// ===================
@@ -74,7 +79,7 @@ function TaskList({
 			if (listOrder.length === 0) return;
 			saveOrder(listOrder);
 		},
-		[listOrder]
+		[listOrder, taskList, taskListID, saveOrder]
 	);
 
 	useEffect(
@@ -188,7 +193,7 @@ function TaskList({
 	function calculateHeight() {
 		if (!taskList) return 0;
 		if (!listOrder) return 0;
-		if (listOrder.length === 0) return 0;
+		// if (listOrder.length === 0) return 0;
 
 		if (isMain) {
 			return "auto";
@@ -201,10 +206,14 @@ function TaskList({
 		}
 	}
 
+	let showEmpty = listOrder?.length === 0;
+	showEmpty = showEmpty || listOrder?.length === pinnedCount;
+	showEmpty = showEmpty && isMain;
+
 	return (
 		<AnimateHeight duration={500} height={calculateHeight()}>
 			<div className={classNames("TaskList", isMain && "TaskListMain")}>
-				{listOrder?.length === 0 && isMain && (
+				{showEmpty && (
 					<div className="TaskListEmpty">
 						<NoTasksSvg />
 					</div>
@@ -222,6 +231,7 @@ function TaskList({
 						strategy={verticalListSortingStrategy}
 					>
 						{listOrder?.map(function (taskId) {
+							if (taskList?.tasks?.[taskId]?.pinned) return null;
 							return (
 								<SortableTaskComponent
 									taskListID={taskListID}

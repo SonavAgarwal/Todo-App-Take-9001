@@ -11,6 +11,7 @@ export interface Task {
 	wasList?: boolean;
 	date?: Timestamp;
 	link?: string;
+	pinned?: boolean;
 }
 
 export enum TaskType {
@@ -32,6 +33,7 @@ export interface TaskUpdateObject {
 	wasList?: boolean;
 	date?: Timestamp | FieldValue;
 	link?: string;
+	pinned?: boolean;
 }
 
 export interface TaskList {
