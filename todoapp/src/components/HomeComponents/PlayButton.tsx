@@ -1,16 +1,12 @@
+import { increment } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { BiPlay } from "react-icons/bi";
 import { updateTask } from "../../firebase.ts";
-import {
-	LENGTH_STEP,
-	MAIN_TASK_LIST_NAME,
-	typeTimeMatters,
-} from "../../misc/options.ts";
+import { LENGTH_STEP, typeTimeMatters } from "../../misc/options.ts";
 import { useTaskList } from "../../misc/useTaskList.ts";
-import { increment } from "firebase/firestore";
 
-const PlayButton = () => {
-	const { taskList } = useTaskList(MAIN_TASK_LIST_NAME);
+const PlayButton = ({ taskListID }: { taskListID: string }) => {
+	const { taskList } = useTaskList(taskListID);
 
 	const [plateLengthInSeconds, setPlateLengthInSeconds] = useState(0);
 	const [plateColon, setPlateColon] = useState(true);
@@ -107,7 +103,7 @@ const PlayButton = () => {
 					return;
 				}
 
-				updateTask(MAIN_TASK_LIST_NAME, nextTaskId, {
+				updateTask(taskListID, nextTaskId, {
 					length: increment(-1 * LENGTH_STEP),
 				});
 			}, LENGTH_STEP * 60 * 1000);

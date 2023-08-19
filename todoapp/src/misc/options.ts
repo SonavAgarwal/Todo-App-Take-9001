@@ -2,7 +2,7 @@ import { Timestamp, deleteField } from "firebase/firestore";
 import isUrl from "is-url";
 import { Task, TaskField, TaskType, TaskUpdateObject } from "./types";
 
-export const VERSION_NUMBER = "2.0.11";
+export const VERSION_NUMBER = "2.1.6";
 export const MAIN_TASK_LIST_NAME = "tasks";
 
 export const TYPE_OPTIONS = [
@@ -27,7 +27,7 @@ export const TAG_TYPES = [
 
 export const LENGTH_COUNTED_TAGS = [TaskType.long, TaskType.email];
 
-export const LENGTH_STEP = 1;
+export const LENGTH_STEP = 5;
 
 export const DAYS_OF_WEEK = [
 	"sunday",

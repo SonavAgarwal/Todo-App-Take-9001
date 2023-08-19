@@ -15,16 +15,15 @@ import {
 	setDoc,
 	updateDoc,
 } from "firebase/firestore";
+import { isEqual } from "lodash";
 import * as shortUUID from "short-uuid";
+import { dataCache } from "./misc/cache";
 import {
 	DEFAULT_TASK,
-	MAIN_TASK_LIST_NAME,
-	parseNewTextToUpdateObject,
 	VERSION_NUMBER,
+	parseNewTextToUpdateObject,
 } from "./misc/options";
 import { Task, TaskType, TaskUpdateObject } from "./misc/types";
-import { dataCache } from "./misc/cache";
-import { isEqual } from "lodash";
 
 export const firebaseConfig = {
 	apiKey: "AIzaSyCF7OvgCxXof4ZYWlPWDud9eHGy7byiO4k",

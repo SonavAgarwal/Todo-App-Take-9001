@@ -3,6 +3,7 @@
 * {
 	font-family: "Space Mono", sans-serif;
 	color: var(--black);
+	scroll-behavior: smooth;
 }
 
 html {
@@ -281,6 +282,7 @@ html {
 	/* max-width: 70rem;
     min-width: 50%; */
 	width: 100%;
+	scroll-behavior: smooth;
 }
 
 .HomePage::-webkit-scrollbar {

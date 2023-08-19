@@ -61,6 +61,12 @@ const TaskComponent = forwardRef(
 			trackTouch: true,
 		});
 		const listSwipeHandlers = useSwipeable({
+			onSwipedLeft: function () {
+				setIsClosing(true);
+				setTimeout(() => {
+					updateTask(taskListID, taskID, { pinned: true });
+				}, 500);
+			},
 			onSwipedUp: function () {
 				setIsClosing(true);
 				setTimeout(() => {
@@ -199,7 +205,10 @@ const TaskComponent = forwardRef(
 							/>
 						</div>
 						{task?.type === "list" && (
-							<SubTaskList taskListID={taskID} open={open}></SubTaskList>
+							<SubTaskList
+								taskListID={taskID}
+								open={open && !props.dragging}
+							></SubTaskList>
 						)}
 					</div>
 				</AnimateHeight>

@@ -3,7 +3,6 @@ import { useEffect, useReducer } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, firestore } from "../firebase";
 import { FBListener, dataCache, listenerCache } from "./cache";
-import { TaskList } from "./types";
 
 export function useListener(docId: string): {
 	loading: boolean;

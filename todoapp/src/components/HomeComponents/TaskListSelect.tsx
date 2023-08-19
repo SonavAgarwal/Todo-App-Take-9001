@@ -1,9 +1,8 @@
-import React from "react";
-import { useTask } from "../../misc/useTask";
-import { MAIN_TASK_LIST_NAME } from "../../misc/options";
+import AnimateHeight from "react-animate-height";
 import { useSwipeable } from "react-swipeable";
 import { updateTask } from "../../firebase";
-import AnimateHeight from "react-animate-height";
+import { MAIN_TASK_LIST_NAME } from "../../misc/options";
+import { useTask } from "../../misc/useTask";
 
 interface Props {
 	selectedTaskListID: string;

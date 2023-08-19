@@ -49,7 +49,13 @@ function TaskTag({ taskListID, taskID, tagType, dragging }: Props) {
 	}
 
 	if (tagType === TaskField.length && typeTimeMatters(task.type)) {
-		return <TimeTag taskListID={taskListID} taskID={taskID}></TimeTag>;
+		return (
+			<TimeTag
+				taskListID={taskListID}
+				taskID={taskID}
+				shouldClose={dragging}
+			></TimeTag>
+		);
 	}
 
 	return null;

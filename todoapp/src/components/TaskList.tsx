@@ -22,7 +22,7 @@ import AnimateHeight from "react-animate-height";
 // @ts-ignore
 import NoTasksSvg from "../assets/NoTasks";
 import { updateTaskOrder } from "../firebase.ts";
-import { TYPE_OPTIONS } from "../misc/options.ts";
+import { MAIN_TASK_LIST_NAME, TYPE_OPTIONS } from "../misc/options.ts";
 import { TaskField } from "../misc/types.ts";
 import { usePinnedLists } from "../misc/usePinnedLists.ts";
 import { useTaskList } from "../misc/useTaskList.ts";
@@ -207,7 +207,9 @@ function TaskList({
 	}
 
 	let showEmpty = listOrder?.length === 0;
-	showEmpty = showEmpty || listOrder?.length === pinnedCount;
+	let isMainEmpty =
+		listOrder?.length === pinnedCount && taskListID === MAIN_TASK_LIST_NAME;
+	showEmpty = showEmpty || isMainEmpty;
 	showEmpty = showEmpty && isMain;
 
 	return (

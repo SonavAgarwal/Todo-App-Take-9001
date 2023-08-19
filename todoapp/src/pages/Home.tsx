@@ -65,7 +65,7 @@ function Home() {
 									<BiLogOut />
 								</button>
 								<div></div>
-								<PlayButton />
+								<PlayButton taskListID={selectedList} />
 								<div></div>
 								{<SortByButton sortBy={sortBy} setSortBy={setSortBy} />}
 							</div>
@@ -77,34 +77,39 @@ function Home() {
 							pinnedListIDs={pinnedLists}
 						/>
 
-						<TaskList
-							showLoading={true}
-							taskListID={selectedList}
-							sortBy={sortBy}
-							isMain={true}
-						></TaskList>
+						<div className="HomePageContentContainer">
+							<TaskList
+								showLoading={true}
+								taskListID={selectedList}
+								sortBy={sortBy}
+								isMain={true}
+							></TaskList>
 
-						<div className="CreateTaskContainer" ref={newTaskRef}>
-							<form className="CreateTask" onSubmit={handleSubmit(onSubmit)}>
-								<div className="CreateTaskInputContainer">
-									<input
-										className="CreateTaskInput"
-										placeholder="new task..."
-										autoComplete="off"
-										onFocus={function (event) {
-											event.target.scrollIntoView();
-										}}
-										{...register("text")}
-									/>
-								</div>
-								<button
-									className="CreateTaskButton"
-									type="submit"
-									tabIndex={-1}
-								>
-									<BiPlus />
-								</button>
-							</form>
+							<div
+								className="CreateTaskContainer CreateTaskContainerMain"
+								ref={newTaskRef}
+							>
+								<form className="CreateTask" onSubmit={handleSubmit(onSubmit)}>
+									<div className="CreateTaskInputContainer">
+										<input
+											className="CreateTaskInput"
+											placeholder="new task..."
+											autoComplete="off"
+											onFocus={function (event) {
+												event.target.scrollIntoView();
+											}}
+											{...register("text")}
+										/>
+									</div>
+									<button
+										className="CreateTaskButton"
+										type="submit"
+										tabIndex={-1}
+									>
+										<BiPlus />
+									</button>
+								</form>
+							</div>
 						</div>
 					</div>
 				</div>

@@ -3,14 +3,25 @@ import { useDebouncedCallback } from "use-debounce";
 import { updateTask } from "../../firebase";
 import { LENGTH_STEP } from "../../misc/options";
 import { useTask } from "../../misc/useTask";
+// @ts-ignore
+import { useLongPress } from "use-long-press";
+import { BiCheck, BiX } from "react-icons/bi";
+import { useMediaQuery } from "../../misc/useMediaQuery";
 
 interface Props {
 	taskListID: string;
 	taskID: string;
+	shouldClose: boolean;
 }
 
-const TimeTag = ({ taskListID, taskID }: Props) => {
+const TimeTag = ({ taskListID, taskID, shouldClose }: Props) => {
 	const { task } = useTask(taskListID, taskID);
+	const isMobile = useMediaQuery("(max-width: 600px)");
+
+	const [pickingTime, setPickingTime] = useState(false);
+	useEffect(() => {
+		if (shouldClose) setPickingTime(false);
+	}, [shouldClose]);
 
 	const dragStartXRef = useRef(0);
 	const mouseDelta = useRef(0);
@@ -31,10 +42,13 @@ const TimeTag = ({ taskListID, taskID }: Props) => {
 	100);
 
 	useEffect(() => {
+		if (isMobile) return;
 		if (!dragging) saveLengthDebounced(length);
 	}, [dragging, saveLengthDebounced, length]);
 
 	const handleMouseDown = (event: MouseEvent<HTMLDivElement>): void => {
+		if (isMobile) return;
+
 		dragStartXRef.current = event.clientX;
 		mouseDelta.current = 0;
 		setDragging(true);
@@ -85,9 +99,61 @@ const TimeTag = ({ taskListID, taskID }: Props) => {
 	};
 
 	return (
-		<div className="ListTaskTag TimeTag" onMouseDown={handleMouseDown}>
-			{length}
-		</div>
+		<>
+			<div
+				className="ListTaskTag TimeTag"
+				onMouseDown={handleMouseDown}
+				onClick={() => {
+					setPickingTime(true);
+				}}
+			>
+				{length}
+			</div>
+			{pickingTime && (
+				<div className="TaskEditFooterContainerContainer">
+					<div className="TaskEditFooterContainer">
+						<div>
+							<p>{length}</p>
+						</div>
+						<input
+							size={1}
+							type={"range"}
+							min={LENGTH_STEP}
+							max={120}
+							step={LENGTH_STEP}
+							value={length}
+							onChange={function (event) {
+								setLength(parseInt(event.target.value));
+							}}
+							className="ListTaskText TimeRangeInput"
+							tabIndex={-1}
+						></input>
+						<div className="TaskEditFooterContainerButtons">
+							<button
+								className="ListTaskButton"
+								onClick={function () {
+									setPickingTime(false);
+									setLength(task?.length || 0);
+								}}
+								tabIndex={-1}
+							>
+								<BiX />
+							</button>
+							<button
+								className="ListTaskButton"
+								onClick={function () {
+									setPickingTime(false);
+									updateTask(taskListID, taskID, { length: length });
+								}}
+								tabIndex={-1}
+							>
+								<BiCheck />
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+		</>
 	);
 };
 
