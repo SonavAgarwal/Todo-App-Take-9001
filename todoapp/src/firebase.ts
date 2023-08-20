@@ -240,7 +240,6 @@ export async function reorganizeConfig() {
 	// get config
 	const configDocRef = doc(firestore, `users/${user.uid}/data`, "config");
 	const configDoc = await getDoc(configDocRef);
-	let configData: DocumentData = configDoc.data() as DocumentData;
 
 	let newColorsData: {
 		colors: {
@@ -258,18 +257,22 @@ export async function reorganizeConfig() {
 		[key: string]: FieldValue;
 	} = {};
 
-	// get keys from config
-	let keys = Object.keys(configData);
+	if (configDoc.exists()) {
+		let configData: DocumentData = configDoc.data() as DocumentData;
 
-	for (let key of keys) {
-		if (key === "versionNumber") continue;
-		if (key === "colors") continue;
+		// get keys from config
+		let keys = Object.keys(configData);
 
-		if (!configData[key]) continue;
+		for (let key of keys) {
+			if (key === "versionNumber") continue;
+			if (key === "colors") continue;
 
-		console.log("setting key: " + key + " to " + configData[key]);
-		newColorsData.colors[key] = configData[key];
-		deleteOldFields[key] = deleteField();
+			if (!configData[key]) continue;
+
+			console.log("setting key: " + key + " to " + configData[key]);
+			newColorsData.colors[key] = configData[key];
+			deleteOldFields[key] = deleteField();
+		}
 	}
 
 	let combinedObject: any = {

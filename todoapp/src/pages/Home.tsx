@@ -1,5 +1,5 @@
 import { signOut } from "firebase/auth";
-import { createContext, useRef, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BiLogOut, BiPlus } from "react-icons/bi";
 import PlayButton from "../components/HomeComponents/PlayButton.tsx";
@@ -16,11 +16,26 @@ import { MAIN_TASK_LIST_NAME } from "../misc/options.ts";
 import { TaskField } from "../misc/types.ts";
 import { usePinnedLists } from "../misc/usePinnedLists.ts";
 import { useUserConfig } from "../misc/useUserConfig.ts";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useNavigate } from "react-router-dom";
 
 export const NewTaskInputFocusContext = createContext(function () {});
 export const UserConfigContext = createContext({});
 
 function Home() {
+	const navigate = useNavigate();
+	const [user, userLoading, userError] = useAuthState(auth);
+	useEffect(
+		function () {
+			if (userLoading) return;
+			if (userError) return;
+			if (!user) {
+				navigate("/auth");
+			}
+		},
+		[user, userLoading, userError]
+	);
+
 	const { userConfig } = useUserConfig();
 
 	const [sortBy, setSortBy] = useState<TaskField>(TaskField.none);
@@ -44,6 +59,7 @@ function Home() {
 	}
 
 	if (userConfig && !userConfig.versionNumber) {
+		// TODO: add check for no config file
 		reorganizeTaskLists();
 		reorganizeConfig();
 		return <div>Reorganizing...</div>;
