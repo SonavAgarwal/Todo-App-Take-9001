@@ -127,6 +127,28 @@ export function deleteTask(taskList: string, taskId: string) {
 	setDoc(taskDocRef, updateObject, { merge: true });
 }
 
+// NOTE: doesn't check for lists
+export function deleteTasksBulk(taskList: string, taskIds: string[]) {
+	if (!user) return;
+
+	const updateObject: {
+		order: FieldValue;
+		tasks: {
+			[key: string]: FieldValue;
+		};
+	} = {
+		order: arrayRemove(...taskIds),
+		tasks: {},
+	};
+
+	for (let taskId of taskIds) {
+		updateObject.tasks[taskId] = deleteField();
+	}
+
+	const taskDocRef = doc(firestore, `users/${user.uid}/data`, taskList);
+	setDoc(taskDocRef, updateObject, { merge: true });
+}
+
 export function updateTaskOrder(taskList: string, newOrder: string[]) {
 	if (!user) return;
 	let updateObject = {

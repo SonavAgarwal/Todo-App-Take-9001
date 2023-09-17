@@ -2,7 +2,7 @@ import { Timestamp, deleteField } from "firebase/firestore";
 import isUrl from "is-url";
 import { Task, TaskField, TaskType, TaskUpdateObject } from "./types";
 
-export const VERSION_NUMBER = "2.1.11";
+export const VERSION_NUMBER = "2.1.12";
 export const MAIN_TASK_LIST_NAME = "tasks";
 
 export const TYPE_OPTIONS = [
